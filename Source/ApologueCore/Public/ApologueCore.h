@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
 
-class FApologueCoreModule : public IModuleInterface
+class FApologueCoreModule final : public IModuleInterface
 {
 public:
 
