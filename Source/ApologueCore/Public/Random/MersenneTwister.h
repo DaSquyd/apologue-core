@@ -1,3 +1,5 @@
+// Copyright (c) 2024 David Jacquish
+
 #pragma once
 
 #include <random>
