@@ -35,7 +35,7 @@ void operator<<(FStructuredArchive::FSlot Slot, std::_Circ_buf<Type, Nw>& Circle
 }
 
 USTRUCT(BlueprintType)
-struct PORYGONUTILS_API FMersenneTwister
+struct APOLOGUECORE_API FMersenneTwister
 {
 	GENERATED_BODY()
 
@@ -48,11 +48,11 @@ private:
 	int64 InitialSeed = 0;
 
 	UPROPERTY()
-	bool bInitialized = false;
+	bool bIsInitialized = false;
 
 public:
 	/**
-	 * Initialize with a random seed
+	 * Initialize with a random seed.
 	 */
 	FORCEINLINE void Initialize()
 	{
@@ -61,14 +61,14 @@ public:
 		std::random_device RandomDevice;
 		InitialSeed = RandomDevice();
 		Engine.seed(InitialSeed);
-		bInitialized = true;
+		bIsInitialized = true;
 	}
 
 	FORCEINLINE void Initialize(const uint64 Seed)
 	{
 		InitialSeed = Seed;
 		Engine.seed(Seed);
-		bInitialized = true;
+		bIsInitialized = true;
 	}
 
 	void Initialize(const FString& Seed)
@@ -80,9 +80,7 @@ public:
 			return;
 		}
 
-		// Explicitly check for 0 or -1 because these are potential fail values for FCString::Strtoi64 and
-		// we don't want any false negatives.
-
+		// Explicitly check for 0 or -1 because these are potential fail values for FCString::Strtoi64() and we don't want any false negatives.
 		const FRegexPattern ZeroPattern(TEXT(R"(^(\+|-)?0+$)"));
 		FRegexMatcher ZeroMatcher(ZeroPattern, Seed);
 		if (ZeroMatcher.FindNext())
@@ -111,7 +109,7 @@ public:
 	}
 
 	/**
-	 * Resets the mersenne twister back to the state from the initial seed
+	 * Resets the mersenne twister back to the state from the initial seed.
 	 */
 	// ReSharper disable once CppMemberFunctionMayBeConst
 	FORCEINLINE void Reset()
@@ -131,7 +129,7 @@ public:
 
 	FORCEINLINE bool IsInitialized() const
 	{
-		return bInitialized;
+		return bIsInitialized;
 	}
 
 	void GetState(TArray<FEngineType::result_type>& Array) const
@@ -153,44 +151,44 @@ public:
 	/**
 	 * Helper function for rand implementations.
 	 *
-	 * @return A random number in [0..A)
+	 * @return A random number in [0..A).
 	*/
 	template <typename T>
 	FORCEINLINE typename TEnableIf<TIsArithmetic<T>::Value && !TIsFloatingPoint<T>::Value, T>::Type
 	RandHelper(const T A) const
 	{
-		ensure(bInitialized);
+		ensure(bIsInitialized);
 		return RandomRange<T>(0, A - 1);
 	}
 
 	/**
-	 * @return A random floating point value in [Min, Max)
+	 * @return A random floating point value in [Min, Max).
 	 */
 	template <typename T>
 	FORCEINLINE typename TEnableIf<TIsFloatingPoint<T>::Value, T>::Type
 	RandomRange(const T Min, const T Max) const
 	{
-		ensure(bInitialized);
+		ensure(bIsInitialized);
 		std::uniform_real_distribution<T> Distribution(Min, Max);
 		const T Value = Distribution(Engine);
 		return Value;
 	}
 
 	/**
-	 * @return A random integer value in [Min, Max]
+	 * @return A random integer value in [Min, Max].
 	 */
 	template <typename T>
 	FORCEINLINE typename TEnableIf<TIsArithmetic<T>::Value && !TIsFloatingPoint<T>::Value, T>::Type
 	RandomRange(const T Min, const T Max) const
 	{
-		ensure(bInitialized);
+		ensure(bIsInitialized);
 		std::uniform_int_distribution<T> Distribution(Min, Max);
 		const T Value = Distribution(Engine);
 		return Value;
 	}
 
 	/**
-	 * @return Random number in [0.0, 1.0)
+	 * @return Random number in [0.0, 1.0).
 	 */
 	template <typename T>
 	FORCEINLINE typename TEnableIf<TIsFloatingPoint<T>::Value, T>::Type
@@ -282,7 +280,7 @@ public:
 	/**
 	 * Returns a random unit vector, uniformly distributed, within the specified cone.
 	 *
-	 * @param Dir The center direction of the cone
+	 * @param Dir The center direction of the cone.
 	 * @param ConeHalfAngleRad Half-angle of cone, in radians.
 	 * @return Normalized vector within the specified cone.
 	 */
@@ -324,13 +322,12 @@ public:
 	/**
 	 * Returns a random unit vector, uniformly distributed, within the specified cone.
 	 *
-	 * @param Dir The center direction of the cone
+	 * @param Dir The center direction of the cone.
 	 * @param HorizontalConeHalfAngleRad Horizontal half-angle of cone, in radians.
 	 * @param VerticalConeHalfAngleRad Vertical half-angle of cone, in radians.
 	 * @return Normalized vector within the specified cone.
 	 */
-	FORCEINLINE FVector GetCone(const FVector& Dir, const double HorizontalConeHalfAngleRad,
-	                            const double VerticalConeHalfAngleRad) const
+	FORCEINLINE FVector GetCone(const FVector& Dir, const double HorizontalConeHalfAngleRad, const double VerticalConeHalfAngleRad) const
 	{
 		if (VerticalConeHalfAngleRad > 0.0 && HorizontalConeHalfAngleRad > 0.0)
 		{
@@ -346,8 +343,7 @@ public:
 			// where ConeHalfAngleRad is now a function of Theta
 			// (specifically, radius of an ellipse as a function of angle)
 			// function is ellipse function (x/a)^2 + (y/b)^2 = 1, converted to polar coords
-			double ConeHalfAngleRad = FMath::Square(FMath::Cos(Theta) / VerticalConeHalfAngleRad) + FMath::Square(
-				FMath::Sin(Theta) / HorizontalConeHalfAngleRad);
+			double ConeHalfAngleRad = FMath::Square(FMath::Cos(Theta) / VerticalConeHalfAngleRad) + FMath::Square(FMath::Sin(Theta) / HorizontalConeHalfAngleRad);
 			ConeHalfAngleRad = FMath::Sqrt(1.0 / ConeHalfAngleRad);
 
 			// clamp to make a cone instead of a sphere
@@ -384,7 +380,7 @@ public:
 	}
 
 	/**
-	 * A version of RandomFromFraction that throws an error if Numerator or Denominator is out of range
+	 * A version of RandomFromFraction that throws an error if Numerator or Denominator is out of range.
 	 * @param Numerator Numerator
 	 * @param Denominator Denominator
 	 * @return Success
@@ -438,7 +434,7 @@ public:
 	// Serialization
 	friend FArchive& operator<<(FArchive& Ar, FMersenneTwister& MersenneTwister)
 	{
-		return Ar << MersenneTwister.InitialSeed << MersenneTwister.Engine;
+		return Ar << MersenneTwister.InitialSeed << MersenneTwister.Engine << MersenneTwister.bIsInitialized;
 	}
 
 	bool Serialize(FArchive& Ar)
@@ -451,6 +447,7 @@ public:
 	{
 		Slot << MersenneTwister.InitialSeed;
 		Slot << MersenneTwister.Engine;
+		Slot << MersenneTwister.bIsInitialized;
 	}
 
 	bool Serialize(const FStructuredArchive::FSlot Slot)
@@ -463,7 +460,7 @@ public:
 const FName RandomAccessToEmptyArrayWarning = FName("RandomAccessToEmptyArrayWarning");
 
 UCLASS()
-class PORYGONUTILS_API UMersenneTwisterLibrary : public UBlueprintFunctionLibrary
+class APOLOGUECORE_API UMersenneTwisterLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 
@@ -514,10 +511,8 @@ public:
 		return MersenneTwister.IsInitialized();
 	}
 
-	// These should all be BlueprintCallable because we want to guarantee execution order
-
 	/**
-	 * Obtains a random bool
+	 * Obtains a random bool.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Utilities|Mersenne Twister", DisplayName="Random Bool")
 	static FORCEINLINE bool RandBool(UPARAM(Ref) const FMersenneTwister& MersenneTwister)
@@ -531,7 +526,7 @@ public:
 	}
 
 	/**
-	 * Obtains a random value in [Min, Max]
+	 * Obtains a random value in [Min, Max].
 	 */
 	UFUNCTION(BlueprintCallable, Category="Utilities|Mersenne Twister", DisplayName="Random Range (Integer)")
 	static FORCEINLINE int32 RandRange_Int32(UPARAM(Ref) const FMersenneTwister& MersenneTwister, const int32 Min, const int32 Max)
@@ -545,7 +540,7 @@ public:
 	}
 
 	/**
-	 * Obtains a random value in [Min, Max]
+	 * Obtains a random value in [Min, Max].
 	 */
 	UFUNCTION(BlueprintCallable, Category="Utilities|Mersenne Twister", DisplayName="Random Range (Integer64)")
 	static FORCEINLINE int64 RandRange_Int64(UPARAM(Ref) const FMersenneTwister& MersenneTwister, const int64 Min, const int64 Max)
@@ -559,11 +554,10 @@ public:
 	}
 
 	/**
-	 * Obtains a random value in [Min, Max)
+	 * Obtains a random value in [Min, Max).
 	 */
 	UFUNCTION(BlueprintCallable, Category="Utilities|Mersenne Twister", DisplayName="Random Range (Float)")
-	static FORCEINLINE double RandRange_Double(UPARAM(Ref) const FMersenneTwister& MersenneTwister, const double Min,
-	                                           const double Max)
+	static FORCEINLINE double RandRange_Double(UPARAM(Ref) const FMersenneTwister& MersenneTwister, const double Min, const double Max)
 	{
 		if (EnsureInitialized(MersenneTwister))
 		{
@@ -574,27 +568,26 @@ public:
 	}
 
 	/** 
-	 * Gets a random item from specified array (using random stream)
+	 * Gets a random item from specified array (using random stream).
 	 * 
-	 * @param MersenneTwister	The random stream
-	 * @param TargetArray		The array
-	 * @param OutElement		The random element from this array
-	 * @param OutIndex			The index of random item (will be -1 if array is empty)
+	 * @param MersenneTwister	The random stream.
+	 * @param TargetArray		The array.
+	 * @param OutElement		The random element from this array.
+	 * @param OutIndex			The index of random item (will be -1 if array is empty).
 	 */
 	UFUNCTION(BlueprintCallable, CustomThunk, Category="Utilities|Mersenne Twister", DisplayName="Random Element in Array",
 		meta=(ArrayParm="TargetArray", ArrayTypeDependentParams="OutElement"))
-	static FORCEINLINE void RandomElementInArray(UPARAM(Ref) const FMersenneTwister& MersenneTwister, const TArray<int32>& TargetArray,
-	                                             int32& OutElement, int32& OutIndex)
+	static FORCEINLINE void RandomElementInArray(UPARAM(Ref) const FMersenneTwister& MersenneTwister, const TArray<int32>& TargetArray, int32& OutElement, int32& OutIndex)
 	{
 		// see execRandomElementInArray for implementation
 		check(0)
 	}
 
 	/** 
-	 * Gets a random item from specified array (using random stream)
+	 * Gets a random item from specified array (using random stream).
 	 * 
-	 * @param MersenneTwister	The random stream
-	 * @param TargetArray		The array
+	 * @param MersenneTwister	The random stream.
+	 * @param TargetArray		The array.
 	 */
 	UFUNCTION(BlueprintCallable, CustomThunk, Category="Utilities|Mersenne Twister", meta=(ArrayParm="TargetArray", Keywords="random"))
 	static FORCEINLINE void ShuffleArray(UPARAM(Ref) const FMersenneTwister& MersenneTwister, const TArray<int32>& TargetArray)
@@ -604,7 +597,7 @@ public:
 	}
 
 	/**
-	 * Obtains a random value in [0.0, 1.0)
+	 * Obtains a random value in [0.0, 1.0).
 	 */
 	UFUNCTION(BlueprintCallable, Category="Utilities|Mersenne Twister")
 	static FORCEINLINE double RandomFraction(UPARAM(Ref) const FMersenneTwister& MersenneTwister)
@@ -618,7 +611,7 @@ public:
 	}
 
 	/**
-	 * Returns a random vector of unit size
+	 * Returns a random vector of unit size.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Utilities|Mersenne Twister")
 	static FORCEINLINE FVector RandomUnitVector(UPARAM(Ref) const FMersenneTwister& MersenneTwister)
@@ -632,7 +625,7 @@ public:
 	}
 
 	/**
-	 * Returns a random 2D point in a unit circle
+	 * Returns a random 2D point in a unit circle.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Utilities|Mersenne Twister", DisplayName="Random Point in Unit Circle")
 	static FORCEINLINE FVector2D RandomPointInUnitCircle(UPARAM(Ref) const FMersenneTwister& MersenneTwister)
@@ -646,7 +639,7 @@ public:
 	}
 
 	/**
-	 * Returns a random 3D point in a unit sphere
+	 * Returns a random 3D point in a unit sphere.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Utilities|Mersenne Twister", DisplayName="Random Point in Unit Sphere")
 	static FORCEINLINE FVector RandomPointInUnitSphere(UPARAM(Ref) const FMersenneTwister& MersenneTwister)
@@ -660,11 +653,10 @@ public:
 	}
 
 	/**
-	 * Returns a random point in a bounding box
+	 * Returns a random point in a bounding box.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Utilities|Mersenne Twister", DisplayName="Random Point in Bounding Box")
-	static FORCEINLINE FVector RandomPointInBoundingBox(UPARAM(Ref) const FMersenneTwister& MersenneTwister, const FVector& Center,
-	                                                    const FVector& HalfSize)
+	static FORCEINLINE FVector RandomPointInBoundingBox(UPARAM(Ref) const FMersenneTwister& MersenneTwister, const FVector& Center, const FVector& HalfSize)
 	{
 		if (EnsureInitialized(MersenneTwister))
 		{
@@ -675,7 +667,7 @@ public:
 	}
 
 	/**
-	 * Returns a random point in a box
+	 * Returns a random point in a box.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Utilities|Mersenne Twister", DisplayName="Random Point in Box")
 	static FORCEINLINE FVector RandomPointInBox(UPARAM(Ref) const FMersenneTwister& MersenneTwister, const FBox& Box)
@@ -691,14 +683,13 @@ public:
 	/**
 	 * Returns a random unit vector, uniformly distributed, within the specified cone.
 	 *
-	 * @param MersenneTwister MersenneTwister
-	 * @param Direction The center direction of the cone
+	 * @param MersenneTwister MersenneTwister.
+	 * @param Direction The center direction of the cone.
 	 * @param HalfAngle Half-angle of cone, in degrees.
 	 * @return Normalized vector within the specified cone.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Utilities|Mersenne Twister", DisplayName="Random Cone")
-	static FORCEINLINE FVector RandomCone(UPARAM(Ref) const FMersenneTwister& MersenneTwister, const FVector& Direction,
-	                                      const double HalfAngle)
+	static FORCEINLINE FVector RandomCone(UPARAM(Ref) const FMersenneTwister& MersenneTwister, const FVector& Direction, const double HalfAngle)
 	{
 		if (EnsureInitialized(MersenneTwister))
 		{
@@ -711,15 +702,15 @@ public:
 	/**
 	 * Returns a random unit vector, uniformly distributed, within the specified cone.
 	 *
-	 * @param MersenneTwister MersenneTwister
-	 * @param Direction The center direction of the cone
+	 * @param MersenneTwister MersenneTwister.
+	 * @param Direction The center direction of the cone.
 	 * @param HalfAngle Half-angle of cone, in degrees.
 	 * @param VerticalHalfAngle Vertical half-angle of cone, in degrees.
 	 * @return Normalized vector within the specified cone.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Utilities|Mersenne Twister", DisplayName="Random Cone with Vertical Half Angle")
-	static FORCEINLINE FVector GetConeWithVertical(UPARAM(Ref) const FMersenneTwister& MersenneTwister, const FVector& Direction,
-	                                               const double HalfAngle, const double VerticalHalfAngle)
+	static FORCEINLINE FVector GetConeWithVertical(UPARAM(Ref) const FMersenneTwister& MersenneTwister, const FVector& Direction, const double HalfAngle,
+	                                               const double VerticalHalfAngle)
 	{
 		if (EnsureInitialized(MersenneTwister))
 		{
@@ -730,8 +721,7 @@ public:
 	}
 
 	UFUNCTION(BlueprintCallable, Category="Utilities|Mersenne Twister", DisplayName="Random from Fraction (Integer)")
-	static FORCEINLINE int32 RandomFromFraction_Int32(UPARAM(Ref) const FMersenneTwister& MersenneTwister, const int32 Numerator,
-	                                                  const int32 Denominator)
+	static FORCEINLINE int32 RandomFromFraction_Int32(UPARAM(Ref) const FMersenneTwister& MersenneTwister, const int32 Numerator, const int32 Denominator)
 	{
 		if (EnsureInitialized(MersenneTwister))
 		{
@@ -742,8 +732,7 @@ public:
 	}
 
 	UFUNCTION(BlueprintCallable, Category="Utilities|Mersenne Twister", DisplayName="Random from Fraction (Integer64)")
-	static FORCEINLINE int64 RandomFromFraction_Int64(UPARAM(Ref) const FMersenneTwister& MersenneTwister, const int64 Numerator,
-	                                                  const int64 Denominator)
+	static FORCEINLINE int64 RandomFromFraction_Int64(UPARAM(Ref) const FMersenneTwister& MersenneTwister, const int64 Numerator, const int64 Denominator)
 	{
 		if (EnsureInitialized(MersenneTwister))
 		{
@@ -755,8 +744,7 @@ public:
 
 private:
 	// ReSharper disable CppParameterMayBeConstPtrOrRef
-	static FORCEINLINE void GenericRandArray(void* TargetArray, const FArrayProperty* ArrayProperty, FMersenneTwister* MersenneTwister,
-	                                         void* OutElement, int32* OutIndex)
+	static FORCEINLINE void GenericRandArray(void* TargetArray, const FArrayProperty* ArrayProperty, FMersenneTwister* MersenneTwister, void* OutElement, int32* OutIndex)
 	// ReSharper restore CppParameterMayBeConstPtrOrRef
 	{
 		*OutIndex = INDEX_NONE;
@@ -777,8 +765,7 @@ private:
 			return;
 		}
 
-		FFrame::KismetExecutionMessage(*FString::Printf(TEXT("Attempted to access random index from empty array!")), ELogVerbosity::Warning,
-		                               RandomAccessToEmptyArrayWarning);
+		FFrame::KismetExecutionMessage(*FString::Printf(TEXT("Attempted to access random index from empty array!")), ELogVerbosity::Warning, RandomAccessToEmptyArrayWarning);
 		InnerProp->InitializeValue(OutElement);
 	}
 
