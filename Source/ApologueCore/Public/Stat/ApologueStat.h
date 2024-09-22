@@ -24,6 +24,8 @@ class APOLOGUECORE_API final UApologueStat : public UDataAsset
 	TObjectPtr<UApologueStatFunction> Function;
 	
 public:
+	const FText& GetDisplayName() const { return DisplayName; }
+	
 	UFUNCTION(BlueprintPure)
 	FApologueStatValue GetValue() const;
 };
