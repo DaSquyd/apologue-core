@@ -36,7 +36,7 @@ void operator<<(FStructuredArchive::FSlot Slot, std::_Circ_buf<Type, Nw>& Circle
 	Slot << CircleBuffer._Idx;
 }
 
-USTRUCT(BlueprintType)
+USTRUCT(BlueprintType, meta=(DisableSplitPin))
 struct APOLOGUECORE_API FMersenneTwister
 {
 	GENERATED_BODY()
