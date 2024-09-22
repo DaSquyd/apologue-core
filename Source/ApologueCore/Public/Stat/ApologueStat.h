@@ -12,8 +12,8 @@ class UApologueStatFunction;
 /**
  * 
  */
-UCLASS(BlueprintType, Blueprintable, DisplayName="Stat")
-class APOLOGUECORE_API final UApologueStat : public UObject
+UCLASS(BlueprintType, DisplayName="Stat")
+class APOLOGUECORE_API final UApologueStat : public UDataAsset
 {
 	GENERATED_BODY()
 
