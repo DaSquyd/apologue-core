@@ -10,7 +10,7 @@
 /**
  * 
  */
-UCLASS(Abstract)
+UCLASS(Abstract, Blueprintable)
 class APOLOGUECORE_API UApologueStatFunction : public UObject
 {
 	GENERATED_BODY()
