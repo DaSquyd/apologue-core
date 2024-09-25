@@ -4,14 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "ApologueEventBroadcaster.generated.h"
+#include "ApologueEventBroadcasterInterface.generated.h"
 
 class UApologueEvent;
 class UApologueEventContext;
 
 // This class does not need to be modified.
 UINTERFACE()
-class UApologueEventBroadcaster : public UInterface
+class UApologueEventBroadcasterInterface : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -19,7 +19,7 @@ class UApologueEventBroadcaster : public UInterface
 /**
  * 
  */
-class APOLOGUECORE_API IApologueEventBroadcaster
+class APOLOGUECORE_API IApologueEventBroadcasterInterface
 {
 	GENERATED_BODY()
 

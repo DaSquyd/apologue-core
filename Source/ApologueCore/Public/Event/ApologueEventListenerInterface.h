@@ -5,11 +5,11 @@
 #include "CoreMinimal.h"
 #include "ApologueCallbackParam.h"
 #include "UObject/Interface.h"
-#include "ApologueEventListener.generated.h"
+#include "ApologueEventListenerInterface.generated.h"
 
 // This class does not need to be modified.
 UINTERFACE()
-class UApologueEventListener : public UInterface
+class UApologueEventListenerInterface : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -17,7 +17,7 @@ class UApologueEventListener : public UInterface
 /**
  * 
  */
-class APOLOGUECORE_API IApologueEventListener
+class APOLOGUECORE_API IApologueEventListenerInterface
 {
 	GENERATED_BODY()
 
