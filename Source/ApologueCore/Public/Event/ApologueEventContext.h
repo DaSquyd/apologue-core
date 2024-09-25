@@ -9,9 +9,9 @@
 class UApologueEventVariable;
 
 /**
- * 
+ * Base class for event context.
  */
-UCLASS(Abstract)
+UCLASS(Abstract, BlueprintType, Blueprintable)
 class APOLOGUECORE_API UApologueEventContext : public UObject
 {
 	GENERATED_BODY()
