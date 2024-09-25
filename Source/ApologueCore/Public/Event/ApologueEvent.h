@@ -15,6 +15,9 @@ class APOLOGUECORE_API UApologueEvent : public UDataAsset
 {
 	GENERATED_BODY()
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess, MustImplement="ApologueEventListenerInterface"))
+	TSoftClassPtr<UObject> ListenerClass;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess))
 	TSoftClassPtr<UApologueEventContext> ContextClass;
 };
