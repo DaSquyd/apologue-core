@@ -3,17 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ApologueStatValue.h"
+#include "ApologueStatFunction.h"
 #include "UObject/Object.h"
 #include "ApologueStat.generated.h"
 
-class UApologueStatFunction;
+class UStatFunctionContext;
 
 /**
  * 
  */
 UCLASS(BlueprintType, DisplayName="Stat")
-class APOLOGUECORE_API final UApologueStat : public UDataAsset
+class APOLOGUECORE_API UApologueStat final : public UDataAsset
 {
 	GENERATED_BODY()
 
@@ -27,5 +27,5 @@ public:
 	const FText& GetDisplayName() const { return DisplayName; }
 	
 	UFUNCTION(BlueprintPure)
-	FApologueStatValue GetValue() const;
+	int32 GetValue(const int32 BaseValue, const UStatFunctionContext* Context) const;
 };

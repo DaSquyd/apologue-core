@@ -3,8 +3,7 @@
 
 #include "Stat/ApologueStatFunction.h"
 
-FApologueStatValue UApologueStatFunction::GetValue_Implementation()
+int32 UApologueStatFunction::GetValue_Implementation(const TSoftObjectPtr<UApologueStat>& Stat, const int32 BaseValue, const UStatFunctionContext* Context)
 {
-	unimplemented()
-	return FApologueStatValue();
+	return BaseValue;
 }
