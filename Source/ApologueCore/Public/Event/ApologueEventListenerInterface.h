@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ApologueCallbackParam.h"
+#include "ApologueEventCallbackParam.h"
 #include "UObject/Interface.h"
 #include "ApologueEventListenerInterface.generated.h"
 
@@ -24,5 +24,5 @@ class APOLOGUECORE_API IApologueEventListenerInterface
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	void GetCallbacks(TArray<FApologueCallbackParam>& OutCallbackParams);
+	void GetCallbacks(TArray<FApologueEventCallbackParam>& OutCallbackParams);
 };
