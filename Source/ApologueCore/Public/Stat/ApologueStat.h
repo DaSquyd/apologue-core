@@ -12,7 +12,7 @@ class UStatFunctionContext;
 /**
  * 
  */
-UCLASS(BlueprintType, DisplayName="Stat")
+UCLASS(BlueprintType)
 class APOLOGUECORE_API UApologueStat final : public UDataAsset
 {
 	GENERATED_BODY()
