@@ -7,7 +7,7 @@
 #include "UObject/Object.h"
 #include "ApologueStat.generated.h"
 
-class UStatFunctionContext;
+class UApologueStatFunctionContext;
 
 /**
  * 
@@ -27,5 +27,5 @@ public:
 	const FText& GetDisplayName() const { return DisplayName; }
 	
 	UFUNCTION(BlueprintPure)
-	int32 GetValue(const int32 BaseValue, const UStatFunctionContext* Context) const;
+	int32 GetValue(const int32 BaseValue, const UApologueStatFunctionContext* Context) const;
 };

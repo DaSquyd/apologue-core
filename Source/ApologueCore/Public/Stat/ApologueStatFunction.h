@@ -7,7 +7,7 @@
 #include "ApologueStatFunction.generated.h"
 
 class UApologueStat;
-class UStatFunctionContext;
+class UApologueStatFunctionContext;
 
 /**
  * 
@@ -19,5 +19,5 @@ class APOLOGUECORE_API UApologueStatFunction : public UObject
 
 public:
 	UFUNCTION(BlueprintNativeEvent, Category="Stat Function")
-	int32 GetValue(const TSoftObjectPtr<UApologueStat>& Stat, const int32 BaseValue, const UStatFunctionContext* Context);
+	int32 GetValue(const TSoftObjectPtr<UApologueStat>& Stat, const int32 BaseValue, const UApologueStatFunctionContext* Context);
 };

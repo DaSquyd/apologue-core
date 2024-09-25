@@ -5,7 +5,7 @@
 
 #include "Stat/ApologueStatFunction.h"
 
-int32 UApologueStat::GetValue(const int32 BaseValue, const UStatFunctionContext* Context) const
+int32 UApologueStat::GetValue(const int32 BaseValue, const UApologueStatFunctionContext* Context) const
 {
 	return Function->GetValue(this, BaseValue, Context);
 }

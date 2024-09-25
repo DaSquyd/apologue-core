@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
-#include "StatFunctionContext.generated.h"
+#include "ApologueStatFunctionContext.generated.h"
 
 /**
  * 
  */
 UCLASS(Abstract, BlueprintType, Blueprintable)
-class APOLOGUECORE_API UStatFunctionContext : public UObject
+class APOLOGUECORE_API UApologueStatFunctionContext : public UObject
 {
 	GENERATED_BODY()
 };
