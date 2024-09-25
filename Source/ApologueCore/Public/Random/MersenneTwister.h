@@ -486,7 +486,7 @@ class APOLOGUECORE_API UMersenneTwisterLibrary : public UBlueprintFunctionLibrar
 	}
 
 public:
-	UFUNCTION(BlueprintCallable, Category="Utilities|Mersenne Twister")
+	UFUNCTION(BlueprintCallable, Category="Apologue|Random|Mersenne Twister")
 	static FORCEINLINE bool GetInitialSeed(UPARAM(Ref) const FMersenneTwister& MersenneTwister, int64& InitialSeed)
 	{
 		if (!MersenneTwister.IsInitialized())
@@ -496,7 +496,7 @@ public:
 		return true;
 	}
 
-	UFUNCTION(BlueprintCallable, Category="Utilities|Mersenne Twister")
+	UFUNCTION(BlueprintCallable, Category="Apologue|Random|Mersenne Twister")
 	static FORCEINLINE bool GetState(UPARAM(Ref) const FMersenneTwister& MersenneTwister, TArray<int64>& State, int32& Index)
 	{
 		if (!MersenneTwister.IsInitialized())
@@ -507,7 +507,7 @@ public:
 		return true;
 	}
 
-	UFUNCTION(BlueprintCallable, Category="Utilities|Mersenne Twister")
+	UFUNCTION(BlueprintCallable, Category="Apologue|Random|Mersenne Twister")
 	static FORCEINLINE bool IsInitialized(UPARAM(Ref) const FMersenneTwister& MersenneTwister)
 	{
 		return MersenneTwister.IsInitialized();
@@ -516,7 +516,7 @@ public:
 	/**
 	 * Obtains a random bool.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Utilities|Mersenne Twister", DisplayName="Random Bool")
+	UFUNCTION(BlueprintCallable, Category="Apologue|Random|Mersenne Twister", DisplayName="Random Bool")
 	static FORCEINLINE bool RandBool(UPARAM(Ref) const FMersenneTwister& MersenneTwister)
 	{
 		if (EnsureInitialized(MersenneTwister))
@@ -530,7 +530,7 @@ public:
 	/**
 	 * Obtains a random value in [Min, Max].
 	 */
-	UFUNCTION(BlueprintCallable, Category="Utilities|Mersenne Twister", DisplayName="Random Range (Integer)")
+	UFUNCTION(BlueprintCallable, Category="Apologue|Random|Mersenne Twister", DisplayName="Random Range (Integer)")
 	static FORCEINLINE int32 RandRange_Int32(UPARAM(Ref) const FMersenneTwister& MersenneTwister, const int32 Min, const int32 Max)
 	{
 		if (EnsureInitialized(MersenneTwister))
@@ -544,7 +544,7 @@ public:
 	/**
 	 * Obtains a random value in [Min, Max].
 	 */
-	UFUNCTION(BlueprintCallable, Category="Utilities|Mersenne Twister", DisplayName="Random Range (Integer64)")
+	UFUNCTION(BlueprintCallable, Category="Apologue|Random|Mersenne Twister", DisplayName="Random Range (Integer64)")
 	static FORCEINLINE int64 RandRange_Int64(UPARAM(Ref) const FMersenneTwister& MersenneTwister, const int64 Min, const int64 Max)
 	{
 		if (EnsureInitialized(MersenneTwister))
@@ -558,7 +558,7 @@ public:
 	/**
 	 * Obtains a random value in [Min, Max).
 	 */
-	UFUNCTION(BlueprintCallable, Category="Utilities|Mersenne Twister", DisplayName="Random Range (Float)")
+	UFUNCTION(BlueprintCallable, Category="Apologue|Random|Mersenne Twister", DisplayName="Random Range (Float)")
 	static FORCEINLINE double RandRange_Double(UPARAM(Ref) const FMersenneTwister& MersenneTwister, const double Min, const double Max)
 	{
 		if (EnsureInitialized(MersenneTwister))
@@ -577,7 +577,7 @@ public:
 	 * @param OutElement		The random element from this array.
 	 * @param OutIndex			The index of random item (will be -1 if array is empty).
 	 */
-	UFUNCTION(BlueprintCallable, CustomThunk, Category="Utilities|Mersenne Twister", DisplayName="Random Element in Array",
+	UFUNCTION(BlueprintCallable, CustomThunk, Category="Apologue|Random|Mersenne Twister", DisplayName="Random Element in Array",
 		meta=(ArrayParm="TargetArray", ArrayTypeDependentParams="OutElement"))
 	static FORCEINLINE void RandomElementInArray(UPARAM(Ref) const FMersenneTwister& MersenneTwister, const TArray<int32>& TargetArray, int32& OutElement, int32& OutIndex)
 	{
@@ -591,7 +591,7 @@ public:
 	 * @param MersenneTwister	The random stream.
 	 * @param TargetArray		The array.
 	 */
-	UFUNCTION(BlueprintCallable, CustomThunk, Category="Utilities|Mersenne Twister", meta=(ArrayParm="TargetArray", Keywords="random"))
+	UFUNCTION(BlueprintCallable, CustomThunk, Category="Apologue|Random|Mersenne Twister", meta=(ArrayParm="TargetArray", Keywords="random"))
 	static FORCEINLINE void ShuffleArray(UPARAM(Ref) const FMersenneTwister& MersenneTwister, const TArray<int32>& TargetArray)
 	{
 		// see execShuffleArray for implementation
@@ -601,7 +601,7 @@ public:
 	/**
 	 * Obtains a random value in [0.0, 1.0).
 	 */
-	UFUNCTION(BlueprintCallable, Category="Utilities|Mersenne Twister")
+	UFUNCTION(BlueprintCallable, Category="Apologue|Random|Mersenne Twister")
 	static FORCEINLINE double RandomFraction(UPARAM(Ref) const FMersenneTwister& MersenneTwister)
 	{
 		if (EnsureInitialized(MersenneTwister))
@@ -615,7 +615,7 @@ public:
 	/**
 	 * Returns a random vector of unit size.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Utilities|Mersenne Twister")
+	UFUNCTION(BlueprintCallable, Category="Apologue|Random|Mersenne Twister")
 	static FORCEINLINE FVector RandomUnitVector(UPARAM(Ref) const FMersenneTwister& MersenneTwister)
 	{
 		if (EnsureInitialized(MersenneTwister))
@@ -629,7 +629,7 @@ public:
 	/**
 	 * Returns a random 2D point in a unit circle.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Utilities|Mersenne Twister", DisplayName="Random Point in Unit Circle")
+	UFUNCTION(BlueprintCallable, Category="Apologue|Random|Mersenne Twister", DisplayName="Random Point in Unit Circle")
 	static FORCEINLINE FVector2D RandomPointInUnitCircle(UPARAM(Ref) const FMersenneTwister& MersenneTwister)
 	{
 		if (EnsureInitialized(MersenneTwister))
@@ -643,7 +643,7 @@ public:
 	/**
 	 * Returns a random 3D point in a unit sphere.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Utilities|Mersenne Twister", DisplayName="Random Point in Unit Sphere")
+	UFUNCTION(BlueprintCallable, Category="Apologue|Random|Mersenne Twister", DisplayName="Random Point in Unit Sphere")
 	static FORCEINLINE FVector RandomPointInUnitSphere(UPARAM(Ref) const FMersenneTwister& MersenneTwister)
 	{
 		if (EnsureInitialized(MersenneTwister))
@@ -657,7 +657,7 @@ public:
 	/**
 	 * Returns a random point in a bounding box.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Utilities|Mersenne Twister", DisplayName="Random Point in Bounding Box")
+	UFUNCTION(BlueprintCallable, Category="Apologue|Random|Mersenne Twister", DisplayName="Random Point in Bounding Box")
 	static FORCEINLINE FVector RandomPointInBoundingBox(UPARAM(Ref) const FMersenneTwister& MersenneTwister, const FVector& Center, const FVector& HalfSize)
 	{
 		if (EnsureInitialized(MersenneTwister))
@@ -671,7 +671,7 @@ public:
 	/**
 	 * Returns a random point in a box.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Utilities|Mersenne Twister", DisplayName="Random Point in Box")
+	UFUNCTION(BlueprintCallable, Category="Apologue|Random|Mersenne Twister", DisplayName="Random Point in Box")
 	static FORCEINLINE FVector RandomPointInBox(UPARAM(Ref) const FMersenneTwister& MersenneTwister, const FBox& Box)
 	{
 		if (EnsureInitialized(MersenneTwister))
@@ -690,7 +690,7 @@ public:
 	 * @param HalfAngle Half-angle of cone, in degrees.
 	 * @return Normalized vector within the specified cone.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Utilities|Mersenne Twister", DisplayName="Random Cone")
+	UFUNCTION(BlueprintCallable, Category="Apologue|Random|Mersenne Twister", DisplayName="Random Cone")
 	static FORCEINLINE FVector RandomCone(UPARAM(Ref) const FMersenneTwister& MersenneTwister, const FVector& Direction, const double HalfAngle)
 	{
 		if (EnsureInitialized(MersenneTwister))
@@ -710,7 +710,7 @@ public:
 	 * @param VerticalHalfAngle Vertical half-angle of cone, in degrees.
 	 * @return Normalized vector within the specified cone.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Utilities|Mersenne Twister", DisplayName="Random Cone with Vertical Half Angle")
+	UFUNCTION(BlueprintCallable, Category="Apologue|Random|Mersenne Twister", DisplayName="Random Cone with Vertical Half Angle")
 	static FORCEINLINE FVector GetConeWithVertical(UPARAM(Ref) const FMersenneTwister& MersenneTwister, const FVector& Direction, const double HalfAngle,
 	                                               const double VerticalHalfAngle)
 	{
@@ -722,7 +722,7 @@ public:
 		return FVector::ZeroVector;
 	}
 
-	UFUNCTION(BlueprintCallable, Category="Utilities|Mersenne Twister", DisplayName="Random from Fraction (Integer)")
+	UFUNCTION(BlueprintCallable, Category="Apologue|Random|Mersenne Twister", DisplayName="Random from Fraction (Integer)")
 	static FORCEINLINE int32 RandomFromFraction_Int32(UPARAM(Ref) const FMersenneTwister& MersenneTwister, const int32 Numerator, const int32 Denominator)
 	{
 		if (EnsureInitialized(MersenneTwister))
@@ -733,7 +733,7 @@ public:
 		return 0;
 	}
 
-	UFUNCTION(BlueprintCallable, Category="Utilities|Mersenne Twister", DisplayName="Random from Fraction (Integer64)")
+	UFUNCTION(BlueprintCallable, Category="Apologue|Random|Mersenne Twister", DisplayName="Random from Fraction (Integer64)")
 	static FORCEINLINE int64 RandomFromFraction_Int64(UPARAM(Ref) const FMersenneTwister& MersenneTwister, const int64 Numerator, const int64 Denominator)
 	{
 		if (EnsureInitialized(MersenneTwister))
