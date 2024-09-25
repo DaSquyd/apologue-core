@@ -11,7 +11,7 @@ class UApologueEventVariable;
 /**
  * 
  */
-UCLASS()
+UCLASS(Abstract)
 class APOLOGUECORE_API UApologueEventContext : public UObject
 {
 	GENERATED_BODY()
