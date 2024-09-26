@@ -26,5 +26,5 @@ class APOLOGUECORE_API IApologueEventBroadcasterInterface
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	void BroadcastEvent(const TSoftObjectPtr<UApologueEvent>& Event, const UApologueEventContext* Context);
+	void EventBroadcaster_BroadcastEvent(const TSoftObjectPtr<UApologueEvent>& Event, const UApologueEventContext* Context);
 };
