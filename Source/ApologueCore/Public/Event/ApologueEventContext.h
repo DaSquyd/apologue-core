@@ -15,4 +15,11 @@ UCLASS(Abstract, BlueprintType, Blueprintable)
 class APOLOGUECORE_API UApologueEventContext : public UObject
 {
 	GENERATED_BODY()
+
+	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, meta=(AllowPrivateAccess))
+	bool bIsCanceled = false;
+
+public:
+	bool IsCanceled() const { return bIsCanceled; }
+	void Cancel() { bIsCanceled = true; }
 };

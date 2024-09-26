@@ -6,7 +6,7 @@
 
 #include "ApologueEventCallbackParam.generated.h"
 
-DECLARE_DYNAMIC_DELEGATE_TwoParams(FApologueCallback, const TScriptInterface<IApologueEventListenerInterface>&, Listener, const UApologueEventContext*, Context);
+DECLARE_DYNAMIC_DELEGATE_OneParam(FApologueCallback, const UApologueEventContext*, Context);
 
 USTRUCT(BlueprintType)
 struct APOLOGUECORE_API FApologueEventCallbackParam
@@ -20,10 +20,10 @@ struct APOLOGUECORE_API FApologueEventCallbackParam
 	FApologueCallback Callback;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 Priority;
+	int32 Priority = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 SubPriority;
+	int32 SubPriority = 0;
 
 	bool IsValid() const
 	{

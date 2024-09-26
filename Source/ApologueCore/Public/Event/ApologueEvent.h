@@ -7,6 +7,8 @@
 #include "ApologueEvent.generated.h"
 
 class UApologueEventContext;
+class UApologueEventSortHandler;
+
 /**
  * 
  */
@@ -15,9 +17,16 @@ class APOLOGUECORE_API UApologueEvent : public UDataAsset
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess, MustImplement="ApologueEventListenerInterface"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess, MustImplement="/Script/ApologueCore.ApologueEventListenerInterface"))
 	TSoftClassPtr<UObject> ListenerClass;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess))
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess))
 	TSoftClassPtr<UApologueEventContext> ContextClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced, meta=(AllowPrivateAccess, ShowOnlyInnerProperties))
+	TObjectPtr<UApologueEventSortHandler> SortHandler;
+
+public:
+	TSoftClassPtr<UObject> GetListenerClass() const { return ListenerClass; }
+	TSoftClassPtr<UApologueEventContext> GetContextClass() const { return ContextClass; }
 };
