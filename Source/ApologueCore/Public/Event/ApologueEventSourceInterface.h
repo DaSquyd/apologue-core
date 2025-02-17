@@ -23,6 +23,6 @@ class APOLOGUECORE_API IApologueEventSourceInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Apologue Event Source Interface")
 	TScriptInterface<IApologueFlagHolderInterface> EventSource_GetFlagHolder();
 };

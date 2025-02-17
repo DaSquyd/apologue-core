@@ -13,10 +13,10 @@ struct FApologueStatTableEntry
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Apologue Stat Table Entry")
 	TSoftObjectPtr<UApologueStat> Stat;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Apologue Stat Table Entry")
 	int32 Value;
 
 	FApologueStatTableEntry()
@@ -66,7 +66,7 @@ struct FApologueStatTable
 	friend class UApologueStatTableFunctionLibrary;
 
 private:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess), Category="Apologue Stat Table")
 	TArray<FApologueStatTableEntry> Entries;
 
 public:
@@ -99,9 +99,10 @@ public:
 
 	explicit FApologueStatTable(const TArray<FApologueStatTableEntry>& InEntries)
 	{
+		Entries.Reserve(InEntries.Num());
 		for (const FApologueStatTableEntry& Entry : InEntries)
 		{
-			if (ensure(!TrySet(Entry.Stat, Entry.Value)))
+			if (ensure(!Has(Entry.Stat)))
 			{
 				Entries.Add(Entry);
 			}
@@ -165,7 +166,7 @@ public:
 
 		return false;
 	}
-
+	
 	void ForEach(const TFunctionRef<void (const TSoftObjectPtr<UApologueStat>& Stat, const int32& Value)>& Function) const
 	{
 		for (const FApologueStatTableEntry& Entry : Entries)
@@ -173,7 +174,20 @@ public:
 			Function(Entry.Stat, Entry.Value);
 		}
 	}
-
+	
+	void ForEach(const TFunctionRef<void (const TSoftObjectPtr<UApologueStat>& Stat, const int32& Value, bool& bBreak)>& Function) const
+	{
+		for (const FApologueStatTableEntry& Entry : Entries)
+		{
+			bool bBreak = false;
+			Function(Entry.Stat, Entry.Value, bBreak);
+			if (bBreak)
+			{
+				return;
+			}
+		}
+	}
+	
 	void ForEach(const TFunctionRef<void (const TSoftObjectPtr<UApologueStat>& StatType, int32& Value)>& Function)
 	{
 		for (FApologueStatTableEntry& Entry : Entries)
@@ -181,12 +195,25 @@ public:
 			Function(Entry.Stat, Entry.Value);
 		}
 	}
+	
+	void ForEach(const TFunctionRef<void (const TSoftObjectPtr<UApologueStat>& StatType, int32& Value, bool& bBreak)>& Function)
+	{
+		for (FApologueStatTableEntry& Entry : Entries)
+		{
+			bool bBreak = false;
+			Function(Entry.Stat, Entry.Value, bBreak);
+			if (bBreak)
+			{
+				return;
+			}
+		}
+	}
 
 	bool Validate() const
 	{
-		for (int32 I = 0; I < Num(); ++I)
+		for (int32 I = 0; I < Num(); I++)
 		{
-			for (int32 J = I + 1; J < Num(); ++J)
+			for (int32 J = I + 1; J < Num(); J++)
 			{
 				if (Entries[I].Stat == Entries[J].Stat)
 				{
@@ -194,7 +221,6 @@ public:
 				}
 			}
 		}
-
 		return true;
 	}
 
@@ -222,9 +248,9 @@ public:
 		return Entries.Num();
 	}
 
-	float GetAverage() const
+	double GetAverage() const
 	{
-		float Total = 0;
+		double Total = 0;
 		for (const FApologueStatTableEntry& Entry : Entries)
 		{
 			Total += Entry.Value;
@@ -234,6 +260,9 @@ public:
 
 	int32 GetMaxValue() const
 	{
+		if (ensure(Num() > 0))
+			return 0;
+		
 		int32 Max = TNumericLimits<int32>::Min();
 		for (int32 Index = 0; Index < Num(); ++Index)
 		{
@@ -247,6 +276,9 @@ public:
 
 	int32 GetMinValue() const
 	{
+		if (ensure(Num() > 0))
+			return 0;
+		
 		int32 Min = TNumericLimits<int32>::Max();
 		for (int32 Index = 0; Index < Num(); ++Index)
 		{
@@ -260,8 +292,12 @@ public:
 
 	int32 GetMaxStats(TArray<TSoftObjectPtr<UApologueStat>>& OutMaxStats) const
 	{
-		int32 Max = TNumericLimits<int32>::Min();
 		OutMaxStats.Reset();
+		
+		if (ensure(Num() > 0))
+			return 0;
+		
+		int32 Max = TNumericLimits<int32>::Min();
 		for (int32 Index = 0; Index < Num(); ++Index)
 		{
 			if (Entries[Index].Value < Max)
@@ -283,8 +319,12 @@ public:
 
 	int32 GetMinStats(TArray<TSoftObjectPtr<UApologueStat>>& OutMinStats) const
 	{
-		int32 Min = TNumericLimits<int32>::Max();
 		OutMinStats.Reset();
+		
+		if (ensure(Num() > 0))
+			return 0;
+		
+		int32 Min = TNumericLimits<int32>::Max();
 		for (int32 Index = 0; Index < Num(); ++Index)
 		{
 			if (Entries[Index].Value > Min)
@@ -334,57 +374,57 @@ class UApologueStatTableFunctionLibrary : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintPure, Category="Pokémon Stat Table", meta=(NativeMakeFunc))
+	UFUNCTION(BlueprintPure, Category="Apologue Stat Table", meta=(NativeMakeFunc))
 	static FApologueStatTable Make(const TArray<FApologueStatTableEntry>& Data)
 	{
 		// Ensures validation
 		return FApologueStatTable(Data);
 	}
 
-	UFUNCTION(BlueprintPure, Category="Pokémon Stat Table", meta=(NativeBreakFunc))
+	UFUNCTION(BlueprintPure, Category="Apologue Stat Table", meta=(NativeBreakFunc))
 	static void Break(const FApologueStatTable& StatTable, UPARAM(DisplayName="Data") TArray<FApologueStatTableEntry>& OutData)
 	{
 		OutData = StatTable.Entries;
 	}
 
-	UFUNCTION(BlueprintPure, Category="Pokémon Stat Table", meta=(AutoCreateRefTerm="StatType"))
+	UFUNCTION(BlueprintPure, Category="Apologue Stat Table", meta=(AutoCreateRefTerm="StatType"))
 	static UPARAM(DisplayName="bSuccess") bool GetStatTableValue(const FApologueStatTable& StatTable, const TSoftObjectPtr<UApologueStat>& StatType, int32& OutValue)
 	{
 		return StatTable.TryGet(StatType, OutValue);
 	}
 
-	UFUNCTION(BlueprintCallable, Category="Pokémon Stat Table", meta=(AutoCreateRefTerm="StatType"))
+	UFUNCTION(BlueprintCallable, Category="Apologue Stat Table", meta=(AutoCreateRefTerm="StatType"))
 	static UPARAM(DisplayName="bSuccess") bool SetStatTableValue(UPARAM(ref) FApologueStatTable& StatTable, const TSoftObjectPtr<UApologueStat>& StatType, const int32 NewValue)
 	{
 		return StatTable.TrySet(StatType, NewValue);
 	}
 
-	UFUNCTION(BlueprintPure, Category="Pokémon Stat Table", meta=(CompactNodeTitle="Total"))
+	UFUNCTION(BlueprintPure, Category="Apologue Stat Table", meta=(CompactNodeTitle="Total"))
 	static UPARAM(DisplayName="Total") int32 GetTotal(const FApologueStatTable& StatTable)
 	{
 		return StatTable.GetTotal();
 	}
 
-	UFUNCTION(BlueprintPure, Category="Pokémon Stat Table", meta=(CompactNodeTitle="Count"))
+	UFUNCTION(BlueprintPure, Category="Apologue Stat Table", meta=(CompactNodeTitle="Count"))
 	static UPARAM(DisplayName="Count") int32 GetCount(const FApologueStatTable& StatTable)
 	{
 		return StatTable.Num();
 	}
 
-	UFUNCTION(BlueprintPure, Category="Pokémon Stat Table", meta=(CompactNodeTitle="Count"))
+	UFUNCTION(BlueprintPure, Category="Apologue Stat Table", meta=(CompactNodeTitle="Count"))
 	static UPARAM(DisplayName="Average") float GetAverage(const FApologueStatTable& StatTable)
 	{
 		return StatTable.Num();
 	}
 
-	UFUNCTION(BlueprintPure, Category="Pokémon Stat Table")
+	UFUNCTION(BlueprintPure, Category="Apologue Stat Table")
 	static UPARAM(DisplayName="Max Value") int32 GetMaxStats(const FApologueStatTable& StatTable,
 	                                                         UPARAM(DisplayName="Stat Types") TArray<TSoftObjectPtr<UApologueStat>>& OutStatTypes)
 	{
 		return StatTable.GetMaxStats(OutStatTypes);
 	}
 
-	UFUNCTION(BlueprintPure, Category="Pokémon Stat Table")
+	UFUNCTION(BlueprintPure, Category="Apologue Stat Table")
 	static UPARAM(DisplayName="Min Value") int32 GetMinStats(const FApologueStatTable& StatTable,
 	                                                         UPARAM(DisplayName="Stat Types") TArray<TSoftObjectPtr<UApologueStat>>& OutStatTypes)
 	{

@@ -17,13 +17,13 @@ class APOLOGUECORE_API UApologueEvent : public UDataAsset
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess, MustImplement="/Script/ApologueCore.ApologueEventListenerInterface"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Apologue Event", meta=(AllowPrivateAccess, MustImplement="/Script/ApologueCore.ApologueEventListenerInterface"))
 	TSoftClassPtr<UObject> ListenerClass;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Apologue Event", meta=(AllowPrivateAccess))
 	TSoftClassPtr<UApologueEventContext> ContextClass;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced, meta=(AllowPrivateAccess, ShowOnlyInnerProperties))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced, Category="Apologue Event", meta=(AllowPrivateAccess, ShowOnlyInnerProperties))
 	TObjectPtr<UApologueEventSortHandler> SortHandler;
 
 public:

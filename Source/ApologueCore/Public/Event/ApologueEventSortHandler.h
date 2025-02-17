@@ -15,6 +15,6 @@ class APOLOGUECORE_API UApologueEventSortHandler : public UObject
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Apologue Event Sort Handler")
 	void Sort(TArray<UObject*>& Objects);
 };

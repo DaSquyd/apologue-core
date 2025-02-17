@@ -3,7 +3,7 @@
 #pragma once
 
 #include "ApologueEvent.h"
-
+#include "Kismet/BlueprintFunctionLibrary.h"
 #include "ApologueEventCallbackParam.generated.h"
 
 DECLARE_DYNAMIC_DELEGATE_OneParam(FApologueCallback, const UApologueEventContext*, Context);
@@ -13,16 +13,16 @@ struct APOLOGUECORE_API FApologueEventCallbackParam
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Apologue Event Callback Param")
 	TSoftObjectPtr<UApologueEvent> Event;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Apologue Event Callback Param")
 	FApologueCallback Callback;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Apologue Event Callback Param")
 	int32 Priority = 0;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Apologue Event Callback Param")
 	int32 SubPriority = 0;
 
 	bool IsValid() const

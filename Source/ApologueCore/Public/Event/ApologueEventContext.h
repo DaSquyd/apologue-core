@@ -16,7 +16,7 @@ class APOLOGUECORE_API UApologueEventContext : public UObject
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, meta=(AllowPrivateAccess))
+	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category="Apologue Event Context", meta=(AllowPrivateAccess))
 	bool bIsCanceled = false;
 
 public:

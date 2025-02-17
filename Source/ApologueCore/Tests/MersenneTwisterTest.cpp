@@ -3,6 +3,7 @@
 #include "Random/MersenneTwister.h"
 
 #include "Containers/UnrealString.h"
+#include "HAL/FileManager.h"
 #include "Tests/TestHarnessAdapter.h"
 
 TEST_CASE_NAMED(FMersenneTwisterTest, "ApologueCore::MersenneTwister", "[Apologue][ApologueCore][MersenneTwister]")

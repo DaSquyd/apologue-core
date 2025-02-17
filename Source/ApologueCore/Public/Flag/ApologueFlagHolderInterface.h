@@ -24,12 +24,12 @@ class APOLOGUECORE_API IApologueFlagHolderInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Apologue Flag Holder Interface")
 	bool FlagHolder_HasFlag(const TSoftObjectPtr<UApologueFlag>& Flag);
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Apologue Flag Holder Interface")
 	bool FlagHolder_HasAllFlags(const TArray<TSoftObjectPtr<UApologueFlag>>& Flags);
 	
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Apologue Flag Holder Interface")
 	bool FlagHolder_HasAnyFlag(const TArray<TSoftObjectPtr<UApologueFlag>>& Flags);
 };

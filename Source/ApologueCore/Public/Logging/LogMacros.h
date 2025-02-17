@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#define APOLOGUE_RETURN_WARNING_V(Condition, FailReturnValue, CategoryName, Format, ...) \
+#define APOLOGUE_RETURN_WARNING(Condition, FailReturnValue, CategoryName, Format, ...) \
 { \
 	if (!(Condition)) \
 	{ \
@@ -15,6 +15,15 @@
 	{ \
 		UE_LOG(CategoryName, Error, Format, ##__VA_ARGS__) \
 		return FailReturnValue; \
+	} \
+}
+
+#define APOLOGUE_RETURN_VOID_ERROR(Condition, CategoryName, Format, ...) \
+{ \
+	if (!(Condition)) \
+	{ \
+		UE_LOG(CategoryName, Error, Format, ##__VA_ARGS__) \
+		return; \
 	} \
 }
 
