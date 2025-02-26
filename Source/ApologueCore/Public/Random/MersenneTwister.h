@@ -235,7 +235,10 @@ public:
 	// Serialization
 	friend FArchive& operator<<(FArchive& Ar, FMersenneTwister& MersenneTwister)
 	{
-		return Ar << MersenneTwister.InitialSeed << MersenneTwister.Engine << MersenneTwister.bIsInitialized;
+		Ar << MersenneTwister.bIsInitialized;
+		Ar << MersenneTwister.InitialSeed;
+		Ar << MersenneTwister.Engine;
+		return Ar;
 	}
 
 	bool Serialize(FArchive& Ar)
@@ -246,9 +249,9 @@ public:
 
 	friend void operator<<(FStructuredArchive::FSlot Slot, FMersenneTwister& MersenneTwister)
 	{
+		Slot << MersenneTwister.bIsInitialized;
 		Slot << MersenneTwister.InitialSeed;
 		Slot << MersenneTwister.Engine;
-		Slot << MersenneTwister.bIsInitialized;
 	}
 
 	bool Serialize(const FStructuredArchive::FSlot Slot)
