@@ -52,40 +52,38 @@ TEST_CASE_NAMED(FMersenneTwisterTest, "ApologueCore::MersenneTwister", "[Apologu
 		constexpr uint64 Seed = 0xDEADBEEF;
 		constexpr uint64 Rand = -1;
 		
-		FMersenneTwister TwisterA;
-		TwisterA.Initialize(Seed);
+		FMersenneTwister SavedTwister;
+		SavedTwister.Initialize(Seed);
 		
-		FMersenneTwister TwisterB;
-		TwisterB.Initialize(Seed);
+		FMersenneTwister CompareTwister;
+		CompareTwister.Initialize(Seed);
 
-		constexpr int32 Iterations = 16;
+		// Shuffle state for entropy
+		constexpr int32 Iterations = 128;
 		for (int32 i = 0; i < Iterations; i++)
 		{
-			TwisterA.RandHelper(1);
-			TwisterB.RandHelper(1);
+			SavedTwister.RandHelper(1);
+			CompareTwister.RandHelper(1);
 		}
 
-		const FString Filename = TEXT("MersenneTwisterTest.bin");
-		IFileManager& FileManager = IFileManager::Get();
+		TArray<uint8> Buffer;
+		FMersenneTwister LoadedTwister;
+		
+		// Writer
+		FMemoryWriter MemoryWriter(Buffer);
+		MemoryWriter << SavedTwister;
 
-		const std::unique_ptr<FArchive> WriteArchive = std::unique_ptr<FArchive>(FileManager.CreateFileWriter(*Filename));
-		*WriteArchive << TwisterA;
-		WriteArchive->Close();
+		// Reader
+		FMemoryReader MemoryReader(Buffer);
+		MemoryReader << LoadedTwister;
 
-		const std::unique_ptr<FArchive> ReadArchive = std::unique_ptr<FArchive>(FileManager.CreateFileReader(*Filename));
-		FMersenneTwister TwisterC;
-		*ReadArchive << TwisterC;
-		ReadArchive->Close();
-
-		FileManager.Delete(*Filename, true);
-
-		if(!TwisterC.IsInitialized())
+		if(!LoadedTwister.IsInitialized())
 		{
 			CHECK(false)
 			return;
 		}
 		
-		CHECK(TwisterB.RandHelper(Rand) == TwisterC.RandHelper(Rand));
+		CHECK(CompareTwister.RandHelper(Rand) == CompareTwister.RandHelper(Rand));
 	}
 }
 
