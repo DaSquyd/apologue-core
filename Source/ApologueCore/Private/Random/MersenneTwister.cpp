@@ -1,6 +1,7 @@
 ﻿#include "Random/MersenneTwister.h"
 
 #include "Internationalization/Regex.h"
+#include "Random/RandomUtil.h"
 
 #if DO_BLUEPRINT_GUARD
 #include "Blueprint/BlueprintExceptionInfo.h"
@@ -13,10 +14,7 @@ void FMersenneTwister::Initialize()
 {
 	// hardware randomization
 	// TODO: Is this the best way to handle this across all devices?
-	std::random_device RandomDevice;
-	InitialSeed = RandomDevice();
-	Engine.seed(InitialSeed);
-	bIsInitialized = true;
+	Initialize(FRandomUtil::GetSeedFromHardware());
 }
 
 void FMersenneTwister::Initialize(const uint64 Seed)
@@ -28,39 +26,7 @@ void FMersenneTwister::Initialize(const uint64 Seed)
 
 void FMersenneTwister::Initialize(const FString& Seed)
 {
-	if (Seed.IsEmpty())
-	{
-		// Random initialization
-		Initialize();
-		return;
-	}
-
-	// Explicitly check for 0 or -1 because these are potential fail values for FCString::Strtoi64() and we don't want any false negatives.
-	const FRegexPattern ZeroPattern(TEXT(R"(^(\+|-)?0+$)"));
-	FRegexMatcher ZeroMatcher(ZeroPattern, Seed);
-	if (ZeroMatcher.FindNext())
-	{
-		Initialize(0);
-		return;
-	}
-
-	const FRegexPattern NegativeOnePattern(TEXT(R"(^-[0]*1$)"));
-	FRegexMatcher NegativeOneMatcher(ZeroPattern, Seed);
-	if (NegativeOneMatcher.FindNext())
-	{
-		Initialize(-1);
-		return;
-	}
-
-	const int64 IntSeed = FCString::Strtoi64(*Seed, nullptr, 10);
-	if (IntSeed != 0 && IntSeed != -1)
-	{
-		Initialize(IntSeed);
-		return;
-	}
-
-	const uint32 HashSeed = GetTypeHash(Seed);
-	Initialize(HashSeed);
+	Initialize(FRandomUtil::GetSeedFromString(Seed));
 }
 
 void FMersenneTwister::GetState(TArray<FEngineType::result_type>& Array) const

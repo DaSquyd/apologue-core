@@ -249,14 +249,26 @@ public:
 
 	friend void operator<<(FStructuredArchive::FSlot Slot, FMersenneTwister& MersenneTwister)
 	{
-		Slot << MersenneTwister.bIsInitialized;
-		Slot << MersenneTwister.InitialSeed;
-		Slot << MersenneTwister.Engine;
+		const FStructuredArchive::FRecord Record = Slot.EnterRecord();
+		Record << MersenneTwister;
 	}
 
 	bool Serialize(const FStructuredArchive::FSlot Slot)
 	{
 		Slot << *this;
+		return true;
+	}
+
+	friend void operator<<(FStructuredArchive::FRecord Record, FMersenneTwister& MersenneTwister)
+	{
+		Record << SA_VALUE(GET_MEMBER_NAME_STRING_CHECKED(FMersenneTwister, bIsInitialized), MersenneTwister.bIsInitialized);
+		Record << SA_VALUE(GET_MEMBER_NAME_STRING_CHECKED(FMersenneTwister, InitialSeed), MersenneTwister.InitialSeed);
+		Record << SA_VALUE(GET_MEMBER_NAME_STRING_CHECKED(FMersenneTwister, Engine), MersenneTwister.Engine);
+	}
+
+	bool Serialize(const FStructuredArchive::FRecord Record)
+	{
+		Record << *this;
 		return true;
 	}
 };
