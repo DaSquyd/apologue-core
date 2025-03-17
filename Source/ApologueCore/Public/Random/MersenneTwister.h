@@ -71,7 +71,11 @@ public:
 
 	FORCEINLINE int64 GetInitialSeed() const { return InitialSeed; }
 
-	FORCEINLINE int32 GetStateIndex() const { return Engine._Idx; }
+	FORCEINLINE int32 GetStateIndex() const
+	{
+		// TODO: It seems that this is necessary as mersenne_twister_engine derives from mersenne_twister privately
+		return reinterpret_cast<std::_Circ_buf<FEngineType::result_type, Engine.state_size>*>(&Engine)->_Idx;
+	}
 
 	FORCEINLINE bool IsInitialized() const { return bIsInitialized; }
 
@@ -237,7 +241,7 @@ public:
 	{
 		Ar << MersenneTwister.bIsInitialized;
 		Ar << MersenneTwister.InitialSeed;
-		Ar << MersenneTwister.Engine;
+		Ar << *reinterpret_cast<std::_Circ_buf<FEngineType::result_type, MersenneTwister.Engine.state_size>*>(&MersenneTwister.Engine);
 		return Ar;
 	}
 

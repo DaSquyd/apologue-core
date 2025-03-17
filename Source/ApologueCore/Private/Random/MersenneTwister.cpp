@@ -36,7 +36,8 @@ void FMersenneTwister::GetState(TArray<FEngineType::result_type>& Array) const
 
 	for (int32 Index = 0; Index < StateSize; ++Index)
 	{
-		Array.Add(Engine._Ax[Index]);
+		const FEngineType::result_type* Ax = reinterpret_cast<std::_Circ_buf<FEngineType::result_type, Engine.state_size>*>(&Engine) ->_Ax;
+		Array.Add(Ax[Index]);
 	}
 }
 
