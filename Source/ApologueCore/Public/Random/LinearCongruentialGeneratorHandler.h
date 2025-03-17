@@ -16,7 +16,6 @@ class APOLOGUECORE_API ULinearCongruentialGeneratorHandler : public URandomHandl
 {
 	GENERATED_BODY()
 
-	UPROPERTY()
 	std::minstd_rand Engine;
 
 	UPROPERTY()
