@@ -37,7 +37,7 @@ class APOLOGUECORE_API ULinearCongruentialGeneratorHandler : public URandomHandl
 
 	virtual int32 Random_Implementation(const int32 Max) override
 	{
-		std::uniform_real_distribution Distribution(0, Max - 1);
+		std::uniform_int_distribution Distribution(0, Max - 1);
 		CurrentSeed = Distribution(Engine);
 		return CurrentSeed;
 	}
