@@ -18,7 +18,7 @@ class APOLOGUECORE_API UMersenneTwisterHandler : public URandomHandlerBase
 	UPROPERTY()
 	FMersenneTwister MersenneTwister;
 
-	FORCEINLINE virtual void Initialize_Implementation(const uint64 Seed) override
+	FORCEINLINE virtual void Initialize_Implementation(const int64 Seed) override
 	{
 		MersenneTwister.Initialize(Seed);
 	}
@@ -28,7 +28,7 @@ class APOLOGUECORE_API UMersenneTwisterHandler : public URandomHandlerBase
 		MersenneTwister.Reset();
 	}
 
-	FORCEINLINE virtual int32 Random_Implementation(const int32 Max) const override
+	FORCEINLINE virtual int32 Random_Implementation(const int32 Max) override
 	{
 		return MersenneTwister.RandHelper(Max);
 	}
