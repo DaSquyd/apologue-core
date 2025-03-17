@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <random>
+
 struct FRandomUtil
 {
 	static int64 GetSeedFromHardware()
