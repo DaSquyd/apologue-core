@@ -24,7 +24,7 @@ class APOLOGUECORE_API ULinearCongruentialGeneratorHandler : public URandomHandl
 	UPROPERTY()
 	uint64 CurrentSeed;
 	
-	virtual void Initialize_Implementation(const uint64 InSeed) override
+	virtual void Initialize_Implementation(const int64 InSeed) override
 	{
 		InitialSeed = InSeed;
 		Engine.seed(InitialSeed);
