@@ -10,7 +10,7 @@ void URandomHandlerBase::Initialize()
 	Initialize(FRandomUtil::GetSeedFromHardware());
 }
 
-void URandomHandlerBase::Initialize_Implementation(const uint64 Seed)
+void URandomHandlerBase::Initialize_Implementation(const int64 Seed)
 {
 	unimplemented()
 }

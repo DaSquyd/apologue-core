@@ -18,7 +18,7 @@ public:
 	void Initialize();
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, BlueprintPure="false")
-	void Initialize(const uint64 Seed);
+	void Initialize(const int64 Seed);
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure="false")
 	void InitializeFromString(const FString& Seed);
