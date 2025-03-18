@@ -20,13 +20,20 @@ void FMersenneTwister::Initialize()
 void FMersenneTwister::Initialize(const uint64 Seed)
 {
 	InitialSeed = Seed;
-	Engine.seed(Seed);
+
+	uint64 Previous = 
+	
 	bIsInitialized = true;
 }
 
 void FMersenneTwister::Initialize(const FString& Seed)
 {
 	Initialize(FRandomUtil::GetSeedFromString(Seed));
+}
+
+void FMersenneTwister::Seed(const uint64 Seed)
+{
+	
 }
 
 void FMersenneTwister::GetState(TArray<FEngineType::result_type>& Array) const

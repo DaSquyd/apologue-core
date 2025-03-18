@@ -42,12 +42,29 @@ struct APOLOGUECORE_API FMersenneTwister
 	typedef std::mt19937_64 FEngineType;
 
 private:
-	mutable FEngineType Engine;
+	static constexpr uint64 WordSize = 64;
+	static constexpr uint64 StateSize = 312;
+	static constexpr uint64 ShiftSize = 156;
+	static constexpr uint64 MaskBits = 31;
+	static constexpr uint64 XORMask = 0xb5026f5aa96619e9ULL;
+	static constexpr uint64 TemperingU = 29;
+	static constexpr uint64 TemperingD = 0x5555555555555555ULL;
+	static constexpr uint64 TemperingS = 17;
+	static constexpr uint64 TemperingB = 0x71d67fffeda60000ULL;
+	static constexpr uint64 TemperingT = 37;
+	static constexpr uint64 TemperingC = 0xfff7eee000000000ULL;
+	static constexpr uint64 TemperingL = 43;
+	static constexpr uint64 InitializationMultiplier = 6364136223846793005ULL;
 
-	UPROPERTY()
+	static constexpr uint64 WMask = ~(~uint64{0} << WordSize - 1 << 1);
+
+	constexpr uint64 DefaultSeed = 5489U;
+
 	int64 InitialSeed = 0;
 
-	UPROPERTY()
+	int64 Index;
+	int64 State[StateSize * 2];
+
 	bool bIsInitialized = false;
 
 public:
@@ -60,13 +77,17 @@ public:
 
 	void Initialize(const FString& Seed);
 
+private:
+	void Seed(const uint64 Seed);
+
+public:
 	/**
 	 * Resets the mersenne twister back to the state from the initial seed.
 	 */
 	// ReSharper disable once CppMemberFunctionMayBeConst
-	FORCEINLINE void Reset() const
+	FORCEINLINE void Reset()
 	{
-		Engine.seed(InitialSeed);
+		Seed(InitialSeed);
 	}
 
 	FORCEINLINE int64 GetInitialSeed() const { return InitialSeed; }
