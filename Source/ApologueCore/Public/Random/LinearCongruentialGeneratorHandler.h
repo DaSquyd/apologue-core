@@ -9,7 +9,7 @@
 #include "LinearCongruentialGeneratorHandler.generated.h"
 
 /**
- * 
+ * https://en.wikipedia.org/wiki/Linear_congruential_generator
  */
 UCLASS()
 class APOLOGUECORE_API ULinearCongruentialGeneratorHandler : public URandomHandlerBase
