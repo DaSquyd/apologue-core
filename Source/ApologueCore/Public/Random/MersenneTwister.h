@@ -1,4 +1,6 @@
-// Copyright (c) 2024 David Jacquish
+// Copyright (c) 2024-2025 David Jacquish
+
+// ReSharper disable CppRedundantCastExpression
 
 #pragma once
 
@@ -34,11 +36,15 @@ void operator<<(FStructuredArchive::FSlot Slot, std::_Circ_buf<Type, Nw>& Circle
 	Slot << CircleBuffer._Idx;
 }
 
+/**
+ * https://en.wikipedia.org/wiki/Mersenne_Twister
+ */
 USTRUCT(BlueprintType, meta=(DisableSplitPin))
 struct APOLOGUECORE_API FMersenneTwister
 {
 	GENERATED_BODY()
 
+	// we use 64-bit Mersenne Twister
 	typedef std::mt19937_64 FEngineType;
 
 private:
@@ -74,7 +80,7 @@ public:
 	FORCEINLINE int32 GetStateIndex() const
 	{
 		// TODO: It seems that this is necessary as mersenne_twister_engine derives from mersenne_twister privately
-		return reinterpret_cast<std::_Circ_buf<FEngineType::result_type, Engine.state_size>*>(&Engine)->_Idx;
+		return ((FEngineType::_Mybase*)&Engine)->_Idx;
 	}
 
 	FORCEINLINE bool IsInitialized() const { return bIsInitialized; }
@@ -267,7 +273,7 @@ public:
 	{
 		Record << SA_VALUE(GET_MEMBER_NAME_STRING_CHECKED(FMersenneTwister, bIsInitialized), MersenneTwister.bIsInitialized);
 		Record << SA_VALUE(GET_MEMBER_NAME_STRING_CHECKED(FMersenneTwister, InitialSeed), MersenneTwister.InitialSeed);
-		Record << SA_VALUE(GET_MEMBER_NAME_STRING_CHECKED(FMersenneTwister, Engine), MersenneTwister.Engine);
+		Record << SA_VALUE(GET_MEMBER_NAME_STRING_CHECKED(FMersenneTwister, Engine), *reinterpret_cast<FEngineType::_Mybase*>(&MersenneTwister.Engine));
 	}
 
 	bool Serialize(const FStructuredArchive::FRecord Record)
