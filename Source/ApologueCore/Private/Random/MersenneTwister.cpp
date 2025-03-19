@@ -1,4 +1,6 @@
-﻿#include "Random/MersenneTwister.h"
+﻿// ReSharper disable CppRedundantCastExpression
+
+#include "Random/MersenneTwister.h"
 
 #include "Internationalization/Regex.h"
 #include "Random/RandomUtil.h"
@@ -36,8 +38,8 @@ void FMersenneTwister::GetState(TArray<FEngineType::result_type>& Array) const
 
 	for (int32 Index = 0; Index < StateSize; ++Index)
 	{
-		const FEngineType::result_type* Ax = reinterpret_cast<std::_Circ_buf<FEngineType::result_type, Engine.state_size>*>(&Engine) ->_Ax;
-		Array.Add(Ax[Index]);
+		const FEngineType::result_type* State = reinterpret_cast<FEngineType::_Mybase*>(&Engine)->_Ax;
+		Array.Add(State[Index]);
 	}
 }
 
