@@ -37,9 +37,4 @@ class APOLOGUECORE_API UMersenneTwisterHandler : public URandomHandlerBase
 	{
 		MersenneTwister.Serialize(Ar);
 	}
-
-	virtual void Serialize(const FStructuredArchive::FRecord Record) override
-	{
-		Record << MersenneTwister;
-	}
 };
