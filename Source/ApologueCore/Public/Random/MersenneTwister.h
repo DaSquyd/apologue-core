@@ -6,6 +6,7 @@
 
 #include <random>
 
+#include "RandomEngine.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Net/Core/PushModel/PushModel.h"
 #include "MersenneTwister.generated.h"
@@ -40,7 +41,7 @@ void operator<<(FStructuredArchive::FSlot Slot, std::_Circ_buf<Type, Nw>& Circle
  * https://en.wikipedia.org/wiki/Mersenne_Twister
  */
 USTRUCT(BlueprintType, meta=(DisableSplitPin))
-struct APOLOGUECORE_API FMersenneTwister
+struct APOLOGUECORE_API FMersenneTwister : public FRandomEngine
 {
 	GENERATED_BODY()
 
@@ -50,40 +51,13 @@ struct APOLOGUECORE_API FMersenneTwister
 private:
 	mutable FEngineType Engine;
 
-	UPROPERTY()
-	int64 InitialSeed = 0;
-
-	UPROPERTY()
-	bool bIsInitialized = false;
-
 public:
-	/**
-	 * Initialize with a random seed.
-	 */
-	void Initialize();
-
-	void Initialize(const uint64 Seed);
-
-	void Initialize(const FString& Seed);
-
-	/**
-	 * Resets the mersenne twister back to the state from the initial seed.
-	 */
-	// ReSharper disable once CppMemberFunctionMayBeConst
-	FORCEINLINE void Reset() const
-	{
-		Engine.seed(InitialSeed);
-	}
-
-	FORCEINLINE int64 GetInitialSeed() const { return InitialSeed; }
+	virtual void Initialize_Implementation(const uint64 Seed) override;
 
 	FORCEINLINE int32 GetStateIndex() const
 	{
-		// TODO: It seems that this is necessary as mersenne_twister_engine derives from mersenne_twister privately
 		return ((FEngineType::_Mybase*)&Engine)->_Idx;
 	}
-
-	FORCEINLINE bool IsInitialized() const { return bIsInitialized; }
 
 	void GetState(TArray<FEngineType::result_type>& Array) const;
 
@@ -92,155 +66,12 @@ public:
 		Initialize();
 	}
 
-	/**
-	 * Helper function for rand implementations.
-	 *
-	 * @return A random number in [0..A).
-	*/
-	template <typename T>
-	typename TEnableIf<TIsArithmetic<T>::Value && !TIsFloatingPoint<T>::Value, T>::Type
-	RandHelper(const T A) const
+	FORCEINLINE virtual uint32 Random() const override
 	{
-		ensure(bIsInitialized);
-		return RandomRange<T>(0, A - 1);
+		return Engine() >> 32;
 	}
-
-	/**
-	 * @return A random floating point value in [Min, Max).
-	 */
-	template <typename T>
-	typename TEnableIf<TIsFloatingPoint<T>::Value, T>::Type
-	RandomRange(const T Min, const T Max) const
-	{
-		ensure(bIsInitialized);
-		std::uniform_real_distribution<T> Distribution(Min, Max);
-		const T Value = Distribution(Engine);
-		return Value;
-	}
-
-	/**
-	 * @return A random integer value in [Min, Max].
-	 */
-	template <typename T>
-	typename TEnableIf<TIsArithmetic<T>::Value && !TIsFloatingPoint<T>::Value, T>::Type
-	RandomRange(const T Min, const T Max) const
-	{
-		ensure(bIsInitialized);
-		std::uniform_int_distribution<T> Distribution(Min, Max);
-		const T Value = Distribution(Engine);
-		return Value;
-	}
-
-	/**
-	 * @return Random number in [0.0, 1.0).
-	 */
-	template <typename T>
-	typename TEnableIf<TIsFloatingPoint<T>::Value, T>::Type
-	GetFraction() const
-	{
-		return RandomRange<T>(0, 1);
-	}
-
-	/**
-	 * Returns a random vector of unit size.
-	 *
-	 * @return Random unit vector.
-	 */
-	FVector GetUnitVector() const;
-
-	/**
-	 * Returns a random point in a 2D unit circle.
-	 *
-	 * @return Random unit circle point.
-	 */
-	FVector2D GetPointInUnitCircle() const;
-
-	/**
-	 * Returns a random point in a 3D unit sphere.
-	 *
-	 * @return Random unit sphere point.
-	 */
-	FVector GetPointInUnitSphere() const;
-
-	FVector GetPointInBoundingBox(const FVector& Center, const FVector& HalfSize) const;
-
-	FORCEINLINE FVector GetPointInBox(const FBox& Box) const;
-
-	/**
-	 * Returns a random unit vector, uniformly distributed, within the specified cone.
-	 *
-	 * @param Dir The center direction of the cone.
-	 * @param ConeHalfAngleRad Half-angle of cone, in radians.
-	 * @return Normalized vector within the specified cone.
-	 */
-	FVector GetCone(const FVector& Dir, const double ConeHalfAngleRad) const;
-
-	/**
-	 * Returns a random unit vector, uniformly distributed, within the specified cone.
-	 *
-	 * @param Dir The center direction of the cone.
-	 * @param HorizontalConeHalfAngleRad Horizontal half-angle of cone, in radians.
-	 * @param VerticalConeHalfAngleRad Vertical half-angle of cone, in radians.
-	 * @return Normalized vector within the specified cone.
-	 */
-	FVector GetCone(const FVector& Dir, const double HorizontalConeHalfAngleRad, const double VerticalConeHalfAngleRad) const;
-
-	/**
-	 * @param Numerator Numerator
-	 * @param Denominator Denominator
-	 * @return Success
-	*/
-	template <typename T>
-	typename TEnableIf<TIsArithmetic<T>::Value && !TIsFloatingPoint<T>::Value, bool>::Type
-	RandomFromFraction(const T Numerator, const T Denominator) const
-	{
-		return RandHelper(Denominator) < Numerator;
-	}
-
-	/**
-	 * A version of RandomFromFraction that throws an error if Numerator or Denominator is out of range.
-	 * @param Numerator Numerator
-	 * @param Denominator Denominator
-	 * @return Success
-	*/
-	bool RandomFromFractionChecked(const int32 Numerator, const int32 Denominator) const;
-
-	// Fisher-Yates
-	template <typename T>
-	void Shuffle(T& List, const typename T::SizeType StartIndex = 0, typename T::SizeType EndIndex = INDEX_NONE)
-	{
-		check(StartIndex >= 0)
-		check(StartIndex < EndIndex)
-		check(EndIndex <= List.Num())
-
-		if (EndIndex == INDEX_NONE)
-		{
-			EndIndex = List.Num();
-		}
-
-		for (int32 Index = StartIndex; Index < EndIndex - 1; ++Index)
-		{
-			CollectionSwap(List, Index, RandomRange(Index, EndIndex - 1));
-		}
-	}
-
-	// Array Swap
-	template <typename T>
-	static void CollectionSwap(TArray<T>& Array, const typename TArray<T>::SizeType IndexA,
-	                           const typename TArray<T>::SizeType IndexB)
-	{
-		// ignores sanity checks in TArray::Swap()
-		Array.SwapMemory(IndexA, IndexB);
-	}
-
-	// Other Container Type Swap
-	template <typename T>
-	static void CollectionSwap(T& Collection, const typename T::SizeType IndexA, const typename T::SizeType IndexB)
-	{
-		T Temp = MoveTempIfPossible(Collection[IndexA]);
-		Collection[IndexA] = MoveTempIfPossible(Collection[IndexB]);
-		Collection[IndexB] = MoveTempIfPossible(Temp);
-	}
+	
+	FORCEINLINE void Discard(const int32 Count) const;
 
 	// Serialization
 	friend FArchive& operator<<(FArchive& Ar, FMersenneTwister& MersenneTwister)

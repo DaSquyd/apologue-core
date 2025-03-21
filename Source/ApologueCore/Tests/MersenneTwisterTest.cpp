@@ -2,8 +2,6 @@
 
 #include "Random/MersenneTwister.h"
 
-#include "Containers/UnrealString.h"
-#include "HAL/FileManager.h"
 #include "Tests/TestHarnessAdapter.h"
 
 TEST_CASE_NAMED(FMersenneTwisterTest, "ApologueCore::MersenneTwister", "[Apologue][ApologueCore][MersenneTwister]")
@@ -19,10 +17,10 @@ TEST_CASE_NAMED(FMersenneTwisterTest, "ApologueCore::MersenneTwister", "[Apologu
 		FMersenneTwister TwisterB;
 		TwisterB.Initialize(Seed);
 
-		CHECK(TwisterA.RandHelper(Rand) == TwisterB.RandHelper(Rand));
-		CHECK(TwisterA.RandHelper(Rand) == TwisterB.RandHelper(Rand));
-		CHECK(TwisterA.RandHelper(Rand) == TwisterB.RandHelper(Rand));
-		CHECK(TwisterA.RandHelper(Rand) == TwisterB.RandHelper(Rand));
+		CHECK(TwisterA.Random(Rand) == TwisterB.Random(Rand));
+		CHECK(TwisterA.Random(Rand) == TwisterB.Random(Rand));
+		CHECK(TwisterA.Random(Rand) == TwisterB.Random(Rand));
+		CHECK(TwisterA.Random(Rand) == TwisterB.Random(Rand));
 	}
 
 	SECTION("Reset")
@@ -32,17 +30,17 @@ TEST_CASE_NAMED(FMersenneTwisterTest, "ApologueCore::MersenneTwister", "[Apologu
 		
 		FMersenneTwister TwisterA;
 		TwisterA.Initialize(Seed);
-		TwisterA.RandHelper(Rand);
-		const int32 ValueAForward = TwisterA.RandHelper(Rand);
+		TwisterA.Random(Rand);
+		const int32 ValueAForward = TwisterA.Random(Rand);
 		
 		FMersenneTwister TwisterB;
 		TwisterB.Initialize(Seed);
-		const int32 ValueB = TwisterB.RandHelper(Rand);
+		const int32 ValueB = TwisterB.Random(Rand);
 
 		CHECK(ValueAForward != ValueB);
 
 		TwisterA.Reset();
-		const int32 ValueAInitial = TwisterA.RandHelper(Rand);
+		const int32 ValueAInitial = TwisterA.Random(Rand);
 
 		CHECK(ValueAInitial == ValueB);
 	}
@@ -62,8 +60,8 @@ TEST_CASE_NAMED(FMersenneTwisterTest, "ApologueCore::MersenneTwister", "[Apologu
 		constexpr int32 Iterations = 128;
 		for (int32 i = 0; i < Iterations; i++)
 		{
-			SavedTwister.RandHelper(1);
-			CompareTwister.RandHelper(1);
+			SavedTwister.Random(1);
+			CompareTwister.Random(1);
 		}
 
 		TArray<uint8> Buffer;
@@ -83,7 +81,7 @@ TEST_CASE_NAMED(FMersenneTwisterTest, "ApologueCore::MersenneTwister", "[Apologu
 			return;
 		}
 		
-		CHECK(CompareTwister.RandHelper(Rand) == CompareTwister.RandHelper(Rand));
+		CHECK(SavedTwister.Random(Rand) == CompareTwister.Random(Rand));
 	}
 }
 

@@ -23,23 +23,37 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure="false")
 	void InitializeFromString(const FString& Seed);
 
+	UFUNCTION(BlueprintPure, BlueprintNativeEvent)
+	bool IsInitialized() const;
+
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, BlueprintPure="false")
 	void Reset();
-	
+
+	/**
+	 * @return Random integer in the range [0... 4294967295]
+	*/
+	uint32 Random();
+
 	/**
 	 * @param Max Exclusive
 	 * @return Random integer in the range [0... Max)
-	 */
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, BlueprintPure="false")
-	int32 Random(const int32 Max);
+	*/
+	uint32 Random(const uint32 Max);
 
 	/**
 	 * @param Min Inclusive
-	 * @param Max Exclusive
-	 * @return Random integer in the range [Min... Max)
+	 * @param Max Inclusive
+	 * @return Random integer in the range [Min... Max]
 	*/
 	UFUNCTION(BlueprintCallable, BlueprintPure="false")
-	int32 RandomRange(const int32 Min, const int32 Max);
+	virtual int32 RandomRange(const int32 Min, const int32 Max);
+
+	/**
+	 * @param Min Inclusive
+	 * @param Max Inclusive
+	 * @return Random integer in the range [Min... Max]
+	*/
+	virtual uint32 RandomRange(const uint32 Min, const uint32 Max);
 
 	/**
 	 * @param Numerator Numerator
@@ -64,4 +78,7 @@ public:
 
 		return nullptr;
 	}
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void Discard(const int32 Count);
 };
