@@ -4,43 +4,41 @@
 
 #include "Tests/TestHarnessAdapter.h"
 
-TEST_CASE_NAMED(FMersenneTwisterTest, "ApologueCore::MersenneTwister", "[Apologue][ApologueCore][MersenneTwister]")
+TEST_CASE_NAMED(FLinearCongruentialGeneratorTest, "ApologueCore::LinearCongruentialGenerator", "[Apologue][ApologueCore][LinearCongruentialGenerator]")
 {
 	SECTION("Consistent Seeding")
 	{
 		constexpr uint64 Seed = 0xDEADBEEF;
-		constexpr uint64 Rand = -1;
 		
-		ULinearCongruentialGeneratorHandler* GeneratorA = NewObject<ULinearCongruentialGeneratorHandler>();
-		GeneratorA->Initialize(Seed);
+		FLinearCongruentialGenerator GeneratorA;
+		GeneratorA.Initialize(Seed);
 		
-		ULinearCongruentialGeneratorHandler* GeneratorB = NewObject<ULinearCongruentialGeneratorHandler>();
-		GeneratorB->Initialize(Seed);
+		FLinearCongruentialGenerator GeneratorB;
+		GeneratorB.Initialize(Seed);
 
-		CHECK(GeneratorA->Random(Rand) == GeneratorB->Random(Rand));
-		CHECK(GeneratorA->Random(Rand) == GeneratorB->Random(Rand));
-		CHECK(GeneratorA->Random(Rand) == GeneratorB->Random(Rand));
-		CHECK(GeneratorA->Random(Rand) == GeneratorB->Random(Rand));
+		CHECK(GeneratorA.Random() == GeneratorB.Random());
+		CHECK(GeneratorA.Random() == GeneratorB.Random());
+		CHECK(GeneratorA.Random() == GeneratorB.Random());
+		CHECK(GeneratorA.Random() == GeneratorB.Random());
 	}
 
 	SECTION("Reset")
 	{
 		constexpr uint64 Seed = 0xDEADBEEF;
-		constexpr uint64 Rand = -1;
 		
-		ULinearCongruentialGeneratorHandler* GeneratorA = NewObject<ULinearCongruentialGeneratorHandler>();
-		GeneratorA->Initialize(Seed);
-		GeneratorA->Random(Rand);
-		const int32 ValueAForward = GeneratorA->Random(Rand);
+		FLinearCongruentialGenerator GeneratorA;
+		GeneratorA.Initialize(Seed);
+		GeneratorA.Random();
+		const int32 ValueAForward = GeneratorA.Random();
 		
-		ULinearCongruentialGeneratorHandler* GeneratorB = NewObject<ULinearCongruentialGeneratorHandler>();
-		GeneratorB->Initialize(Seed);
-		const int32 ValueB = GeneratorB->Random(Rand);
+		FLinearCongruentialGenerator GeneratorB;
+		GeneratorB.Initialize(Seed);
+		const int32 ValueB = GeneratorB.Random();
 
 		CHECK(ValueAForward != ValueB);
 
-		GeneratorA->Reset();
-		const int32 ValueAInitial = GeneratorA->Random(Rand);
+		GeneratorA.Reset();
+		const int32 ValueAInitial = GeneratorA.Random();
 
 		CHECK(ValueAInitial == ValueB);
 	}
@@ -48,7 +46,41 @@ TEST_CASE_NAMED(FMersenneTwisterTest, "ApologueCore::MersenneTwister", "[Apologu
 	SECTION("Serialization")
 	{
 		constexpr uint64 Seed = 0xDEADBEEF;
-		constexpr uint64 Rand = -1;
+		
+		FLinearCongruentialGenerator SavedGenerator;
+		SavedGenerator.Initialize(Seed);
+		
+		FLinearCongruentialGenerator CompareGenerator;
+		CompareGenerator.Initialize(Seed);
+
+		// Shuffle state for entropy
+		constexpr int32 Iterations = 128;
+		SavedGenerator.Discard(Iterations);
+		CompareGenerator.Discard(Iterations);
+
+		TArray<uint8> Buffer;
+		FLinearCongruentialGenerator LoadedGenerator;
+		
+		// Writer
+		FMemoryWriter MemoryWriter(Buffer);
+		SavedGenerator.Serialize(MemoryWriter);
+
+		// Reader
+		FMemoryReader MemoryReader(Buffer);
+		LoadedGenerator.Serialize(MemoryReader);
+
+		if(!LoadedGenerator.IsInitialized())
+		{
+			CHECK(false)
+			return;
+		}
+		
+		CHECK(SavedGenerator.Random() == CompareGenerator.Random());
+	}
+
+	SECTION("UObject Serialization")
+	{
+		constexpr uint64 Seed = 0xDEADBEEF;
 		
 		ULinearCongruentialGeneratorHandler* SavedGenerator = NewObject<ULinearCongruentialGeneratorHandler>();
 		SavedGenerator->Initialize(Seed);
@@ -58,11 +90,8 @@ TEST_CASE_NAMED(FMersenneTwisterTest, "ApologueCore::MersenneTwister", "[Apologu
 
 		// Shuffle state for entropy
 		constexpr int32 Iterations = 128;
-		for (int32 i = 0; i < Iterations; i++)
-		{
-			SavedGenerator->Random(1);
-			SavedGenerator->Random(1);
-		}
+		SavedGenerator->Discard(Iterations);
+		CompareGenerator->Discard(Iterations);
 
 		TArray<uint8> Buffer;
 		ULinearCongruentialGeneratorHandler* LoadedGenerator = NewObject<ULinearCongruentialGeneratorHandler>();
@@ -80,8 +109,11 @@ TEST_CASE_NAMED(FMersenneTwisterTest, "ApologueCore::MersenneTwister", "[Apologu
 			CHECK(false)
 			return;
 		}
+
+		uint32 Random1 = SavedGenerator->Random();
+		uint32 Random2 = CompareGenerator->Random();
 		
-		CHECK(LoadedGenerator->Random(Rand) == CompareGenerator->Random(Rand));
+		CHECK(Random1 == Random2);
 	}
 }
 

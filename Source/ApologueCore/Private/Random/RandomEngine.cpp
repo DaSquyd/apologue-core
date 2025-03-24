@@ -26,19 +26,13 @@ void FRandomEngine::Initialize_Implementation(const uint64 Seed)
 	unimplemented()
 }
 
-uint32 FRandomEngine::Random() const
+uint32 FRandomEngine::Random()
 {
 	unimplemented()
 	return 0;
 }
 
-uint32 FRandomEngine::Random(const uint32 A) const
-{
-	checkSlow(bIsInitialized)
-	return static_cast<uint64>(Random()) * A >> 32;
-}
-
-FVector FRandomEngine::GetUnitVector() const
+FVector FRandomEngine::GetUnitVector()
 {
 	FVector Result;
 	FVector::FReal Length;
@@ -56,7 +50,7 @@ FVector FRandomEngine::GetUnitVector() const
 	return Result.GetUnsafeNormal();
 }
 
-FVector2D FRandomEngine::GetPointInUnitCircle() const
+FVector2D FRandomEngine::GetPointInUnitCircle()
 {
 	FVector2D Result;
 	FVector2D::FReal Length;
@@ -72,7 +66,7 @@ FVector2D FRandomEngine::GetPointInUnitCircle() const
 	return Result;
 }
 
-FVector FRandomEngine::GetPointInUnitSphere() const
+FVector FRandomEngine::GetPointInUnitSphere()
 {
 	FVector Result;
 	FVector::FReal Length;
@@ -89,21 +83,21 @@ FVector FRandomEngine::GetPointInUnitSphere() const
 	return Result;
 }
 
-FVector FRandomEngine::GetPointInBoundingBox(const FVector& Center, const FVector& HalfSize) const
+FVector FRandomEngine::GetPointInBoundingBox(const FVector& Center, const FVector& HalfSize)
 {
 	const FVector BoxMin = Center - HalfSize;
 	const FVector BoxMax = Center + HalfSize;
 	return GetPointInBox(FBox(BoxMin, BoxMax));
 }
 
-FVector FRandomEngine::GetPointInBox(const FBox& Box) const
+FVector FRandomEngine::GetPointInBox(const FBox& Box)
 {
 	return FVector(RandomRange(Box.Min.X, Box.Max.X),
 				   RandomRange(Box.Min.Y, Box.Max.Y),
 				   RandomRange(Box.Min.Z, Box.Max.Z));
 }
 
-FVector FRandomEngine::GetCone(const FVector& Dir, const double ConeHalfAngleRad) const
+FVector FRandomEngine::GetCone(const FVector& Dir, const double ConeHalfAngleRad)
 {
 	if (ConeHalfAngleRad <= 0.f)
 	{
@@ -138,7 +132,7 @@ FVector FRandomEngine::GetCone(const FVector& Dir, const double ConeHalfAngleRad
 	return Result;
 }
 
-FVector FRandomEngine::GetCone(const FVector& Dir, const double HorizontalConeHalfAngleRad, const double VerticalConeHalfAngleRad) const
+FVector FRandomEngine::GetCone(const FVector& Dir, const double HorizontalConeHalfAngleRad, const double VerticalConeHalfAngleRad)
 {
 	if (VerticalConeHalfAngleRad <= 0.0 || HorizontalConeHalfAngleRad <= 0.0)
 	{
@@ -176,4 +170,9 @@ FVector FRandomEngine::GetCone(const FVector& Dir, const double HorizontalConeHa
 	Result = Result.GetSafeNormal();
 
 	return Result;
+}
+
+void FRandomEngine::Discard(const int32 Count)
+{
+	unimplemented()
 }

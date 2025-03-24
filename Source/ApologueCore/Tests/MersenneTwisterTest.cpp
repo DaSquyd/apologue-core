@@ -1,4 +1,5 @@
-﻿#if WITH_TESTS
+﻿#include "Random/MersenneTwisterHandler.h"
+#if WITH_TESTS
 
 #include "Random/MersenneTwister.h"
 
@@ -9,38 +10,36 @@ TEST_CASE_NAMED(FMersenneTwisterTest, "ApologueCore::MersenneTwister", "[Apologu
 	SECTION("Consistent Seeding")
 	{
 		constexpr uint64 Seed = 0xDEADBEEF;
-		constexpr uint64 Rand = -1;
-		
+
 		FMersenneTwister TwisterA;
 		TwisterA.Initialize(Seed);
-		
+
 		FMersenneTwister TwisterB;
 		TwisterB.Initialize(Seed);
 
-		CHECK(TwisterA.Random(Rand) == TwisterB.Random(Rand));
-		CHECK(TwisterA.Random(Rand) == TwisterB.Random(Rand));
-		CHECK(TwisterA.Random(Rand) == TwisterB.Random(Rand));
-		CHECK(TwisterA.Random(Rand) == TwisterB.Random(Rand));
+		CHECK(TwisterA.Random() == TwisterB.Random());
+		CHECK(TwisterA.Random() == TwisterB.Random());
+		CHECK(TwisterA.Random() == TwisterB.Random());
+		CHECK(TwisterA.Random() == TwisterB.Random());
 	}
 
 	SECTION("Reset")
 	{
 		constexpr uint64 Seed = 0xDEADBEEF;
-		constexpr uint64 Rand = -1;
-		
+
 		FMersenneTwister TwisterA;
 		TwisterA.Initialize(Seed);
-		TwisterA.Random(Rand);
-		const int32 ValueAForward = TwisterA.Random(Rand);
-		
+		TwisterA.Random();
+		const int32 ValueAForward = TwisterA.Random();
+
 		FMersenneTwister TwisterB;
 		TwisterB.Initialize(Seed);
-		const int32 ValueB = TwisterB.Random(Rand);
+		const int32 ValueB = TwisterB.Random();
 
 		CHECK(ValueAForward != ValueB);
 
 		TwisterA.Reset();
-		const int32 ValueAInitial = TwisterA.Random(Rand);
+		const int32 ValueAInitial = TwisterA.Random();
 
 		CHECK(ValueAInitial == ValueB);
 	}
@@ -48,40 +47,74 @@ TEST_CASE_NAMED(FMersenneTwisterTest, "ApologueCore::MersenneTwister", "[Apologu
 	SECTION("Serialization")
 	{
 		constexpr uint64 Seed = 0xDEADBEEF;
-		constexpr uint64 Rand = -1;
-		
+
 		FMersenneTwister SavedTwister;
 		SavedTwister.Initialize(Seed);
-		
+
 		FMersenneTwister CompareTwister;
 		CompareTwister.Initialize(Seed);
 
 		// Shuffle state for entropy
 		constexpr int32 Iterations = 128;
-		for (int32 i = 0; i < Iterations; i++)
-		{
-			SavedTwister.Random(1);
-			CompareTwister.Random(1);
-		}
+		SavedTwister.Discard(Iterations);
+		CompareTwister.Discard(Iterations);
 
 		TArray<uint8> Buffer;
 		FMersenneTwister LoadedTwister;
-		
+
 		// Writer
 		FMemoryWriter MemoryWriter(Buffer);
-		MemoryWriter << SavedTwister;
+		SavedTwister.Serialize(MemoryWriter);
 
 		// Reader
 		FMemoryReader MemoryReader(Buffer);
-		MemoryReader << LoadedTwister;
+		LoadedTwister.Serialize(MemoryReader);
 
-		if(!LoadedTwister.IsInitialized())
+		if (!LoadedTwister.IsInitialized())
 		{
 			CHECK(false)
 			return;
 		}
-		
-		CHECK(SavedTwister.Random(Rand) == CompareTwister.Random(Rand));
+
+		CHECK(SavedTwister.Random() == CompareTwister.Random());
+	}
+
+	SECTION("UObject Serialization")
+	{
+		constexpr uint64 Seed = 0xDEADBEEF;
+
+		UMersenneTwisterHandler* SavedTwister = NewObject<UMersenneTwisterHandler>();
+		SavedTwister->Initialize(Seed);
+
+		UMersenneTwisterHandler* CompareTwister = NewObject<UMersenneTwisterHandler>();
+		CompareTwister->Initialize(Seed);
+
+		// Shuffle state for entropy
+		constexpr int32 Iterations = 128;
+		SavedTwister->Discard(Iterations);
+		CompareTwister->Discard(Iterations);
+
+		TArray<uint8> Buffer;
+		UMersenneTwisterHandler* LoadedTwister = NewObject<UMersenneTwisterHandler>();
+
+		// Writer
+		FMemoryWriter MemoryWriter(Buffer);
+		SavedTwister->Serialize(MemoryWriter);
+
+		// Reader
+		FMemoryReader MemoryReader(Buffer);
+		LoadedTwister->Serialize(MemoryReader);
+
+		if (!LoadedTwister->IsInitialized())
+		{
+			CHECK(false)
+			return;
+		}
+
+		uint32 Random1 = SavedTwister->Random();
+		uint32 Random2 = CompareTwister->Random();
+
+		CHECK(Random1 == Random2);
 	}
 }
 

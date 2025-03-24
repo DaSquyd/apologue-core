@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2025 David Jacquish
 
 #pragma once
-#include "Math/FloatPacker.h"
+#include "Math/Int128.h"
 
 #include "RandomEngine.generated.h"
 
@@ -37,95 +37,120 @@ public:
 
 	FORCEINLINE int64 GetInitialSeed() const { return InitialSeed; }
 
-	virtual uint32 Random() const;
+	FORCEINLINE void Reset()
+	{
+		Initialize(InitialSeed);
+	}
+	
+	virtual uint32 Random();
+
+	template <typename T>
+	typename TEnableIf<TIsIntegral<T>::Value, T>::Type
+	FORCEINLINE Random()
+	{
+		checkSlow(bIsInitialized)
+		
+		if constexpr (sizeof(T) <= 4)
+		{
+			return Random();
+		}
+		else if constexpr (sizeof(T) <= 8)
+		{
+			T Low = Random();
+			T High = Random();
+			return Low | (High << 32);
+		}
+		else
+		{
+			static_assert(0);
+			return {};
+		}
+	}
 
 	/**
 	 * @return A random number in [0..A).
 	*/
-	uint32 Random(const uint32 A) const;
-
-private:
 	template <typename T>
-	T GetFraction() const
-	{
-		return 0.0;
-	}
-
-public:
-	/**
-	 * @return Random number in [0.0, 1.0).
-	*/
-	template <>
-	// ReSharper disable once CppExplicitSpecializationInNonNamespaceScope
-	float GetFraction<float>() const
-	{
-		return GetFraction_Internal<float, 23>();
-	}
-
-	/**
-	 * @return Random number in [0.0, 1.0).
-	*/
-	template <>
-	// ReSharper disable once CppExplicitSpecializationInNonNamespaceScope
-	double GetFraction<double>() const
-	{
-		return GetFraction_Internal<double, 52>();
-	}
-
-private:
-	template <typename T, int Mantissa>
-	T GetFraction_Internal() const
+	typename TEnableIf<TIsIntegral<T>::Value, T>::Type
+	FORCEINLINE Random(const T A)
 	{
 		checkSlow(bIsInitialized)
-
-		T ReturnValue;
-
-		typedef typename TUnsignedIntType<sizeof(T)>::Type DataType;
-		constexpr int32 TotalBits = sizeof(T) * CHAR_BIT;
-		constexpr DataType NegativeMask = 1 << (TotalBits - 1);
-		constexpr DataType MantissaMask = (DataType(1) << Mantissa) - 1;
-		constexpr DataType ExponentMask = ~(NegativeMask | MantissaMask);
-
-		DataType Data = Random();
-
-		constexpr int32 LeftShift = Mantissa - 32;
-
-		if constexpr (LeftShift > 0)
+		
+		checkSlow(!TIsSigned<T>::Value || A > 0)
+		
+		if constexpr (sizeof(T) <= 4)
 		{
-			Data <<= LeftShift;
+			return (static_cast<uint64>(Random()) * A) >> 32;
 		}
-		else if constexpr (LeftShift < 0)
+		else if constexpr (sizeof(T) <= 8)
 		{
-			Data >>= -LeftShift;
+			FUInt128 Rand(Random<T>());
+
+			FUInt128 LowMultiply = Rand.Multiply(A);
+			FUInt128 HighMultiply = Rand.Multiply(A >> 32);
+
+			uint64 ReturnValue = 0;
+			ReturnValue += (static_cast<uint64>(HighMultiply.GetQuadPart(2)) + static_cast<uint64>(LowMultiply.GetQuadPart(3))) << 32; // High
+			ReturnValue += static_cast<uint64>(HighMultiply.GetQuadPart(1)) + static_cast<uint64>(LowMultiply.GetQuadPart(2)); // Low
+			ReturnValue += (static_cast<uint64>(HighMultiply.GetQuadPart(0)) + static_cast<uint64>(LowMultiply.GetQuadPart(1))) >> 32; // Carry
+			
+			return ReturnValue;
 		}
-
-		*reinterpret_cast<uint64*>(&ReturnValue) = ExponentMask | (Data & MantissaMask);
-
-		return ReturnValue - static_cast<T>(1.0);
+		else
+		{
+			static_assert(0);
+			return {};
+		}
 	}
 
-public:
+	/**
+	 * @return A random floating point value in [0.0, 1.0].
+	*/
+	template <typename T>
+	typename TEnableIf<TIsFloatingPoint<T>::Value, T>::Type
+	GetFraction()
+	{
+		if constexpr (sizeof(T) <= 4)
+		{
+			return ((0x3F800000U) + RandomRange(0, 0x00800000)) - 1.0f;
+		}
+		else if constexpr (sizeof(T) == 8)
+		{
+			return (0x3FF0000000000000ULL + RandomRange<uint64>(0, 0x0010000000000000)) - 1.0f;
+		}
+		else
+		{
+			static_assert(0);
+			return {};
+		}
+	}
+
 	/**
 	 * @return A random floating point value in [Min, Max).
 	*/
 	template <typename T>
-	typename TEnableIf<TOr<TOrValue<std::is_same_v<T, float>>, TOrValue<std::is_same_v<T, double>>>::Value, T>::Type
-	RandomRange(const T Min, const T Max) const
+	typename TEnableIf<TIsFloatingPoint<T>::Value, T>::Type
+	RandomRange(const T Min, const T Max)
 	{
 		checkSlow(bIsInitialized)
 		return (Max - Min) * GetFraction<T>() + Min;
 	}
 
 	/**
-	 * @return A random integer value in [Min, Max).
-	 */
+	 * @return A random integer point value in [Min, Max].
+	*/
 	template <typename T>
-	typename TEnableIf<TOr<TOrValue<std::is_same_v<T, int32>>, TOrValue<std::is_same_v<T, uint32>>>::Value, T>::Type
-	RandomRange(const int32 Min, const int32 Max) const
+	typename TEnableIf<TIsIntegral<T>::Value, T>::Type
+	RandomRange(const T Min, const T Max)
 	{
 		checkSlow(bIsInitialized)
 		checkSlow(Max >= Min)
-		return Random(Max - Min + 1u) + Min;
+		if (Max == TNumericLimits<T>::Max() && Min == TNumericLimits<T>::Min())
+		{
+			return Random<T>();
+		}
+
+		return Random<T>(Max - Min + 1) + Min;
 	}
 
 	/**
@@ -134,13 +159,13 @@ public:
 	 * @return Success
 	*/
 	template <typename T>
-	typename TEnableIf<TOr<TOrValue<std::is_same_v<T, int32>>, TOrValue<std::is_same_v<T, uint32>>>::Value, bool>::Type
-	RandomFromFraction(const T Numerator, const T Denominator) const
+	typename TEnableIf<TIsIntegral<T>::Value, bool>::Type
+	RandomFromFraction(const T Numerator, const T Denominator)
 	{
 		checkSlow(Numerator <= Denominator)
 		checkSlow(Denominator > 0)
 
-		return Random(Denominator) < Numerator;
+		return Random<T>(Denominator) < Numerator;
 	}
 
 	/**
@@ -148,25 +173,25 @@ public:
 	 *
 	 * @return Random unit vector.
 	 */
-	FVector GetUnitVector() const;
+	FVector GetUnitVector();
 
 	/**
 	 * Returns a random point in a 2D unit circle.
 	 *
 	 * @return Random unit circle point.
 	 */
-	FVector2D GetPointInUnitCircle() const;
+	FVector2D GetPointInUnitCircle();
 
 	/**
 	 * Returns a random point in a 3D unit sphere.
 	 *
 	 * @return Random unit sphere point.
 	 */
-	FVector GetPointInUnitSphere() const;
+	FVector GetPointInUnitSphere();
 
-	FVector GetPointInBoundingBox(const FVector& Center, const FVector& HalfSize) const;
+	FVector GetPointInBoundingBox(const FVector& Center, const FVector& HalfSize);
 
-	FORCEINLINE FVector GetPointInBox(const FBox& Box) const;
+	FORCEINLINE FVector GetPointInBox(const FBox& Box);
 
 	/**
 	 * Returns a random unit vector, uniformly distributed, within the specified cone.
@@ -175,7 +200,7 @@ public:
 	 * @param ConeHalfAngleRad Half-angle of cone, in radians.
 	 * @return Normalized vector within the specified cone.
 	 */
-	FVector GetCone(const FVector& Dir, const double ConeHalfAngleRad) const;
+	FVector GetCone(const FVector& Dir, const double ConeHalfAngleRad);
 
 	/**
 	 * Returns a random unit vector, uniformly distributed, within the specified cone.
@@ -185,7 +210,7 @@ public:
 	 * @param VerticalConeHalfAngleRad Vertical half-angle of cone, in radians.
 	 * @return Normalized vector within the specified cone.
 	 */
-	FVector GetCone(const FVector& Dir, const double HorizontalConeHalfAngleRad, const double VerticalConeHalfAngleRad) const;
+	FVector GetCone(const FVector& Dir, const double HorizontalConeHalfAngleRad, const double VerticalConeHalfAngleRad);
 
 	// Fisher-Yates
 	template <typename T>
@@ -209,7 +234,7 @@ public:
 	// Array Swap
 	template <typename T>
 	static void CollectionSwap(TArray<T>& Array, const typename TArray<T>::SizeType IndexA,
-							   const typename TArray<T>::SizeType IndexB)
+	                           const typename TArray<T>::SizeType IndexB)
 	{
 		// ignores sanity checks in TArray::Swap()
 		Array.SwapMemory(IndexA, IndexB);
@@ -222,5 +247,25 @@ public:
 		T Temp = MoveTempIfPossible(Collection[IndexA]);
 		Collection[IndexA] = MoveTempIfPossible(Collection[IndexB]);
 		Collection[IndexB] = MoveTempIfPossible(Temp);
+	}
+
+	virtual void Discard(const int32 Count);
+
+	virtual void Serialize(FArchive& Ar)
+	{
+		Ar << bIsInitialized;
+		Ar << InitialSeed;
+	}
+
+	void Serialize(FStructuredArchive::FSlot Slot)
+	{
+		FStructuredArchive::FRecord Record = Slot.EnterRecord();
+		Serialize(Record);
+	}
+
+	virtual void Serialize(FStructuredArchive::FRecord& Record)
+	{
+		Record << SA_VALUE(GET_MEMBER_NAME_STRING_CHECKED(FRandomEngine, bIsInitialized), bIsInitialized);
+		Record << SA_VALUE(GET_MEMBER_NAME_STRING_CHECKED(FRandomEngine, InitialSeed), InitialSeed);
 	}
 };
