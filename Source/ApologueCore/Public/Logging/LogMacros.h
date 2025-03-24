@@ -1,46 +1,17 @@
 ﻿#pragma once
 
-#define APOLOGUE_RETURN_WARNING(Condition, FailReturnValue, CategoryName, Format, ...) \
+#if WITH_EDITOR
+#define AP_LOG(CategoryName, Verbosity, Format, ...) \
 { \
-	if (!(Condition)) \
-	{ \
-		UE_LOG(CategoryName, Warning, Format, ##__VA_ARGS__) \
-		return FailReturnValue; \
-	} \
+	UE_LOG(CategoryName, Verbosity, Format, ##__VA_ARGS__); \
+	FMessageLog("PIE").Info()->AddToken(FTextToken::Create(FText::FromString(FString::Printf(Format, ##__VA_ARGS__) + TEXT(" ") + FString(__FILE__) + TEXT("(") + FString::FromInt(__LINE__) + TEXT(")")), false)); \
 }
+#else
+#define AP_LOG(CategoryName, Verbosity, Format, ...) \
+{ \
+	UE_LOG(CategoryName, Verbosity, Format, ##__VA_ARGS__); \
+}
+#endif
 
-#define APOLOGUE_RETURN_ERROR(Condition, FailReturnValue, CategoryName, Format, ...) \
-{ \
-	if (!(Condition)) \
-	{ \
-		UE_LOG(CategoryName, Error, Format, ##__VA_ARGS__) \
-		return FailReturnValue; \
-	} \
-}
-
-#define APOLOGUE_RETURN_VOID_ERROR(Condition, CategoryName, Format, ...) \
-{ \
-	if (!(Condition)) \
-	{ \
-		UE_LOG(CategoryName, Error, Format, ##__VA_ARGS__) \
-		return; \
-	} \
-}
-
-#define APOLOGUE_RETURN_FATAL(Condition, FailReturnValue, CategoryName, Format, ...) \
-{ \
-	if (!(Condition)) \
-	{ \
-		UE_LOG(CategoryName, Fatal, Format, ##__VA_ARGS__) \
-		return FailReturnValue; \
-	} \
-}
-
-#define APOLOGUE_RETURN_ENSURE(Condition, FailReturnValue, CategoryName, Format, ...) \
-{ \
-	if (!ensureMsgf(Condition, Format, ##__VA_ARGS__)) \
-	{ \
-		UE_LOG(CategoryName, Error, Format, ##__VA_ARGS__) \
-		return FailReturnValue; \
-	} \
-}
+#define AP_CLOG(Condition, CategoryName, Verbosity, Format, ...) \
+	if (Condition) { AP_LOG(CategoryName, Verbosity, Format, ##__VA_ARGS__) }
