@@ -142,12 +142,12 @@ public:
 	}
 
 	/**
-	 * @tparam T Element type
+	 * @tparam T Array type
 	 * @param Array Array to select from
 	 * @return A pointer to a random element within the provided array; nullptr if array was empty
 	 */
 	template <typename T>
-	T* RandomSample(const TArray<T>& Array)
+	typename T::ElementType* RandomSample(const T& Array)
 	{
 		if (!Array.IsEmpty())
 		{
@@ -158,13 +158,13 @@ public:
 	}
 
 	/**
-	 * @tparam T Element type
+	 * @tparam T Array type
 	 * @param Array Array to select from
 	 * @return A random element within the provided array
 	 * @throws std::out_of_range Array is empty
 	 */
 	template <typename T>
-	T& RandomSample(const TArray<T>& Array)
+	typename T::ElementType& RandomSample(const T& Array)
 	{
 		if (!Array.IsEmpty())
 		{
@@ -172,6 +172,25 @@ public:
 		}
 
 		throw std::out_of_range("Array is empty");
+	}
+
+	template <typename T>
+	void Shuffle(const T& Range)
+	{
+		auto Data = GetData(Range);
+
+		using SizeType = decltype(GetNum(Range));
+		const SizeType Num = GetNum(Range);
+
+		for (SizeType Index = 0; Index < Num - 1; ++Index)
+		{
+			// Get a random integer in [Index, Num)
+			const SizeType RandomIndex = Index + static_cast<SizeType>(Random(Num - Index));
+			if (RandomIndex != Index)
+			{
+				Swap(Data[Index], Data[RandomIndex]);
+			}
+		}
 	}
 
 	UFUNCTION(BlueprintCallable)
