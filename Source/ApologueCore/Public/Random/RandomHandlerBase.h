@@ -43,7 +43,6 @@ protected:
 	virtual FRandomEngine& GetEngine();
 
 public:
-
 	/**
 	 * @return Random integer in the range [0... 4294967295]
 	*/
@@ -51,7 +50,7 @@ public:
 	{
 		return GetEngine().Random();
 	}
-	
+
 	/**
 	 * @param Max Exclusive
 	 * @return Random integer in the range [0... Max)
@@ -166,12 +165,8 @@ public:
 	template <typename T>
 	typename T::ElementType& RandomSample(const T& Array)
 	{
-		if (!Array.IsEmpty())
-		{
-			return Array[Random(Array.Num())];
-		}
-
-		throw std::out_of_range("Array is empty");
+		checkSlow(!Array.IsEmpty());
+		return Array[Random(Array.Num())];
 	}
 
 	template <typename T>
@@ -202,14 +197,14 @@ public:
 	virtual void Serialize(FArchive& Ar) override
 	{
 		Super::Serialize(Ar);
-		
+
 		GetEngine().Serialize(Ar);
 	}
 
 	virtual void Serialize(FStructuredArchive::FRecord Record) override
 	{
 		Super::Serialize(Record);
-		
+
 		GetEngine().Serialize(Record);
 	}
 };
