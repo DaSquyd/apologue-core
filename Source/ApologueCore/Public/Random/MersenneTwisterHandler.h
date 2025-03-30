@@ -18,8 +18,8 @@ class APOLOGUECORE_API UMersenneTwisterHandler : public URandomHandlerBase
 	UPROPERTY(BlueprintReadOnly, meta=(allowPrivateAccess))
 	FMersenneTwister MersenneTwister;
 	
-	virtual FRandomEngine& GetEngine() override
+	virtual FRandomEngine* GetEngine() override
 	{
-		return MersenneTwister;
+		return &MersenneTwister;
 	}
 };

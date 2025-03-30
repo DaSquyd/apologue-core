@@ -20,8 +20,8 @@ class APOLOGUECORE_API ULinearCongruentialGeneratorHandler : public URandomHandl
 	UPROPERTY()
 	FLinearCongruentialGenerator Generator;
 
-	virtual FRandomEngine& GetEngine() override
+	virtual FRandomEngine* GetEngine() override
 	{
-		return Generator;
+		return &Generator;
 	}
 };
