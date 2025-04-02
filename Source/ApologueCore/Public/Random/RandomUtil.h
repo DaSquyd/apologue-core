@@ -19,27 +19,32 @@ struct FRandomUtil
 			return GetSeedFromHardware();
 		}
 
-		// Explicitly check for 0 or -1 because these are potential fail values for FCString::Strtoi64() and we don't want any false negatives.
-		const FRegexPattern ZeroPattern(TEXT(R"(^(\+|-)?0+$)"));
+		// Explicitly check for 0 because this is a potential fail value for FCString::Strtoi64() and we don't want any false negatives.
+		const FRegexPattern ZeroPattern(TEXT(R"(^\s*(\+|-)?(0(x|X))?0+$)"));
 		FRegexMatcher ZeroMatcher(ZeroPattern, StringSeed);
 		if (ZeroMatcher.FindNext())
 		{
 			return 0;
 		}
 
-		const FRegexPattern NegativeOnePattern(TEXT(R"(^-[0]*1$)"));
-		FRegexMatcher NegativeOneMatcher(ZeroPattern, StringSeed);
-		if (NegativeOneMatcher.FindNext())
+		const FRegexPattern HexadecimalPattern(TEXT(R"(^\s*(\+|-)?0(x|X)[0-9a-fA-F]+$)"));
+		FRegexMatcher HexadecimalMatcher(HexadecimalPattern, StringSeed);
+		if (HexadecimalMatcher.FindNext())
 		{
-			return -1;
+			const int64 HexadecimalSeed = FCString::Strtoi64(*StringSeed, nullptr, 16);
+			if (HexadecimalSeed != 0 && HexadecimalSeed != -1)
+			{
+				return HexadecimalSeed;
+			}
 		}
 
-		const int64 IntSeed = FCString::Strtoi64(*StringSeed, nullptr, 10);
-		if (IntSeed != 0 && IntSeed != -1)
+		const int64 DecimalSeed = FCString::Strtoi64(*StringSeed, nullptr, 10);
+		if (DecimalSeed != 0 && DecimalSeed != -1)
 		{
-			return IntSeed;
+			return DecimalSeed;
 		}
-		
+
+		CityHash64(GetData(StringSeed), StringSeed.IsNumeric());
 		return GetTypeHash(StringSeed);
 	}
 };
