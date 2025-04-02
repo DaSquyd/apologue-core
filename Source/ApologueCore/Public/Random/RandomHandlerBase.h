@@ -21,7 +21,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Initialize(const int64 Seed)
 	{
-		GetEngine().Initialize(Seed);
+		GetEngine()->Initialize(Seed);
 	}
 
 	UFUNCTION(BlueprintCallable)
@@ -30,17 +30,17 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool IsInitialized()
 	{
-		return GetEngine().IsInitialized();
+		return GetEngine()->IsInitialized();
 	}
 
 	UFUNCTION(BlueprintCallable)
 	void Reset()
 	{
-		GetEngine().Reset();
+		GetEngine()->Reset();
 	}
 
 protected:
-	virtual FRandomEngine& GetEngine();
+	virtual FRandomEngine* GetEngine();
 
 public:
 	/**
@@ -48,7 +48,7 @@ public:
 	*/
 	uint32 Random()
 	{
-		return GetEngine().Random();
+		return GetEngine()->Random();
 	}
 
 	/**
@@ -57,7 +57,7 @@ public:
 	*/
 	uint32 Random(const uint32 Max)
 	{
-		return GetEngine().Random(Max);
+		return GetEngine()->Random(Max);
 	}
 
 	/**
@@ -67,7 +67,7 @@ public:
 	*/
 	int8 RandomRange_Int8(const int8 Min, const int8 Max)
 	{
-		return GetEngine().RandomRange<int8>(Min, Max);
+		return GetEngine()->RandomRange<int8>(Min, Max);
 	}
 
 	/**
@@ -78,7 +78,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure="false", Category="ApologueCore|Random", DisplayName="Random Range (byte)")
 	uint8 RandomRange_UInt8(const uint8 Min, const uint8 Max)
 	{
-		return GetEngine().RandomRange<uint8>(Min, Max);
+		return GetEngine()->RandomRange<uint8>(Min, Max);
 	}
 
 	/**
@@ -89,7 +89,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure="false", Category="ApologueCore|Random", DisplayName="Random Range (integer)")
 	int32 RandomRange_Int32(const int32 Min, const int32 Max)
 	{
-		return GetEngine().RandomRange<int32>(Min, Max);
+		return GetEngine()->RandomRange<int32>(Min, Max);
 	}
 
 	/**
@@ -99,7 +99,7 @@ public:
 	*/
 	uint32 RandomRange_UInt32(const uint32 Min, const uint32 Max)
 	{
-		return GetEngine().RandomRange<uint32>(Min, Max);
+		return GetEngine()->RandomRange<uint32>(Min, Max);
 	}
 
 	/**
@@ -110,7 +110,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure="false", Category="ApologueCore|Random", DisplayName="Random Range (integer64)")
 	int64 RandomRange_Int64(const int64 Min, const int64 Max)
 	{
-		return GetEngine().RandomRange<int64>(Min, Max);
+		return GetEngine()->RandomRange<int64>(Min, Max);
 	}
 
 	/**
@@ -120,13 +120,13 @@ public:
 	*/
 	uint64 RandomRange_UInt64(const uint64 Min, const uint64 Max)
 	{
-		return GetEngine().RandomRange<uint64>(Min, Max);
+		return GetEngine()->RandomRange<uint64>(Min, Max);
 	}
 
 	template <typename T>
 	T RandomRange(const T Min, const T Max)
 	{
-		return GetEngine().RandomRange<T>(Min, Max);
+		return GetEngine()->RandomRange<T>(Min, Max);
 	}
 
 	/**
@@ -137,7 +137,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure="false")
 	bool RandomFromFraction(const int32 Numerator, const int32 Denominator)
 	{
-		return GetEngine().RandomFromFraction(Numerator, Denominator);
+		return GetEngine()->RandomFromFraction(Numerator, Denominator);
 	}
 
 	/**
@@ -191,20 +191,20 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Discard(const int32 Count)
 	{
-		return GetEngine().Discard(Count);
+		return GetEngine()->Discard(Count);
 	}
 
 	virtual void Serialize(FArchive& Ar) override
 	{
 		Super::Serialize(Ar);
 
-		GetEngine().Serialize(Ar);
+		GetEngine()->Serialize(Ar);
 	}
 
 	virtual void Serialize(FStructuredArchive::FRecord Record) override
 	{
 		Super::Serialize(Record);
 
-		GetEngine().Serialize(Record);
+		GetEngine()->Serialize(Record);
 	}
 };

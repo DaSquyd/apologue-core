@@ -41,7 +41,7 @@ public:
 	{
 		Initialize(InitialSeed);
 	}
-	
+
 	virtual uint32 Random();
 
 	template <typename T>
@@ -49,7 +49,7 @@ public:
 	FORCEINLINE Random()
 	{
 		checkSlow(bIsInitialized)
-		
+
 		if constexpr (sizeof(T) <= 4)
 		{
 			return Random();
@@ -62,7 +62,6 @@ public:
 		}
 		else
 		{
-			static_assert(0);
 			return {};
 		}
 	}
@@ -75,9 +74,9 @@ public:
 	FORCEINLINE Random(const T A)
 	{
 		checkSlow(bIsInitialized)
-		
+
 		checkSlow(!TIsSigned<T>::Value || A > 0)
-		
+
 		if constexpr (sizeof(T) <= 4)
 		{
 			return (static_cast<uint64>(Random()) * A) >> 32;
@@ -93,12 +92,11 @@ public:
 			ReturnValue += (static_cast<uint64>(HighMultiply.GetQuadPart(2)) + static_cast<uint64>(LowMultiply.GetQuadPart(3))) << 32; // High
 			ReturnValue += static_cast<uint64>(HighMultiply.GetQuadPart(1)) + static_cast<uint64>(LowMultiply.GetQuadPart(2)); // Low
 			ReturnValue += (static_cast<uint64>(HighMultiply.GetQuadPart(0)) + static_cast<uint64>(LowMultiply.GetQuadPart(1))) >> 32; // Carry
-			
+
 			return ReturnValue;
 		}
 		else
 		{
-			static_assert(0);
 			return {};
 		}
 	}
@@ -120,7 +118,6 @@ public:
 		}
 		else
 		{
-			static_assert(0);
 			return {};
 		}
 	}

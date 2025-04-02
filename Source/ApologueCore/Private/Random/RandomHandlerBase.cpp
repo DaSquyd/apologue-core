@@ -15,8 +15,8 @@ void URandomHandlerBase::InitializeFromString(const FString& Seed)
 	Initialize(FRandomUtil::GetSeedFromString(Seed));
 }
 
-FRandomEngine& URandomHandlerBase::GetEngine()
+FRandomEngine* URandomHandlerBase::GetEngine()
 {
 	unimplemented()
-	throw;
+	return nullptr;
 }
