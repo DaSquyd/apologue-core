@@ -196,7 +196,7 @@ int32 FApologueStatTable::GetMaxValue() const
 {
 	if (Num() == 0)
 	{
-		AP_LOG(LogApologueCore, Error, TEXT("Cannot get max value from an empty Stat Table"))
+		AP_LOG_ERROR(LogApologueCore, TEXT("Cannot get max value from an empty Stat Table"))
 		return 0;
 	}
 
@@ -216,7 +216,7 @@ int32 FApologueStatTable::GetMinValue() const
 {
 	if (Num() == 0)
 	{
-		AP_LOG(LogApologueCore, Error, TEXT("Cannot get min value from an empty Stat Table"))
+		AP_LOG_ERROR(LogApologueCore, TEXT("Cannot get min value from an empty Stat Table"))
 		return 0;
 	}
 
@@ -238,7 +238,7 @@ int32 FApologueStatTable::GetMaxStats(TArray<TSoftObjectPtr<UApologueStat>>& Out
 
 	if (Num() == 0)
 	{
-		AP_LOG(LogApologueCore, Error, TEXT("Cannot get max stats from an empty Stat Table"))
+		AP_LOG_ERROR(LogApologueCore, TEXT("Cannot get max stats from an empty Stat Table"))
 		return 0;
 	}
 
@@ -268,7 +268,7 @@ int32 FApologueStatTable::GetMinStats(TArray<TSoftObjectPtr<UApologueStat>>& Out
 
 	if (Num() == 0)
 	{
-		AP_LOG(LogApologueCore, Error, TEXT("Cannot get min stats from an empty Stat Table"))
+		AP_LOG_ERROR(LogApologueCore, TEXT("Cannot get min stats from an empty Stat Table"))
 		return 0;
 	}
 
