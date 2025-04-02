@@ -11,7 +11,7 @@ struct FRandomUtil
 		std::random_device RandomDevice;
 		return RandomDevice();
 	}
-	
+
 	static int64 GetSeedFromString(const FString& StringSeed)
 	{
 		if (StringSeed.IsEmpty())
@@ -44,7 +44,6 @@ struct FRandomUtil
 			return DecimalSeed;
 		}
 
-		CityHash64(GetData(StringSeed), StringSeed.IsNumeric());
 		return GetTypeHash(StringSeed);
 	}
 };
