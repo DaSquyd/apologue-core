@@ -83,7 +83,3 @@
 	{ if (Condition) { AP_LOG_VERBOSE(CategoryName, Format, ##__VA_ARGS__) } }
 #define AP_CLOG_VERY_VERBOSE(Condition, CategoryName, Format, ...) \
 	{ if (Condition) { AP_LOG_VERY_VERBOSE(CategoryName, Format, ##__VA_ARGS__) } }
-
-// #if WITH_EDITOR
-// #undef AP_LOG_MESSAGE_PRIVATE
-// #endif
