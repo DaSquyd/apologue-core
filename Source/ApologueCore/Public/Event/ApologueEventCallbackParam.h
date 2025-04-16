@@ -19,11 +19,19 @@ struct APOLOGUECORE_API FApologueEventCallbackParam
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Apologue Event Callback Param")
 	FApologueCallback Callback;
 
+	// The following Priority, SubPriority, and Order are used for sorting callbacks. 
+
+	// Highest level prioritization; best used for major turn order overrides (e.g., battle phases)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Apologue Event Callback Param")
 	int32 Priority = 0;
 
+	// Highest level prioritization; best used for minor turn order overrides (e.g., attacks that always go first)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Apologue Event Callback Param")
 	int32 SubPriority = 0;
+
+	// Lowest level prioritization; best used for standard turn ordering (e.g., a Fighter's speed stat)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Apologue Event Callback Param")
+	int32 Order = 0;
 
 	bool IsValid() const
 	{
@@ -38,7 +46,7 @@ inline bool operator==(const FApologueEventCallbackParam& A, const FApologueEven
 	check(A.IsValid());
 	check(B.IsValid());
 	checkf(A.Event == B.Event, UNLIKE_EVENT_COMPARISON);
-	return A.Priority == B.Priority && A.SubPriority == B.SubPriority;
+	return A.Priority == B.Priority && A.SubPriority == B.SubPriority && A.Order == B.Order;
 }
 
 inline bool operator!=(const FApologueEventCallbackParam& A, const FApologueEventCallbackParam& B)
@@ -46,15 +54,25 @@ inline bool operator!=(const FApologueEventCallbackParam& A, const FApologueEven
 	check(A.IsValid());
 	check(B.IsValid());
 	checkf(A.Event == B.Event, UNLIKE_EVENT_COMPARISON);
-	return A.Priority != B.Priority || A.SubPriority != B.SubPriority;
+	return A.Priority != B.Priority || A.SubPriority != B.SubPriority || A.Order != B.Order;
 }
 
 inline bool operator<(const FApologueEventCallbackParam& A, const FApologueEventCallbackParam& B)
 {
 	check(A.IsValid());
 	check(B.IsValid());
-	checkf(A.Event == B.Event, UNLIKE_EVENT_COMPARISON);	
-	return A.Priority == B.Priority ? A.SubPriority < B.SubPriority : A.Priority < B.Priority;
+	checkf(A.Event == B.Event, UNLIKE_EVENT_COMPARISON);
+	if (A.Priority == B.Priority)
+	{
+		if (A.SubPriority == B.SubPriority)
+		{
+			return A.Order < B.Order;
+		}
+
+		return A.SubPriority < B.SubPriority;
+	}
+
+	return A.Priority < B.Priority;
 }
 
 inline bool operator>(const FApologueEventCallbackParam& A, const FApologueEventCallbackParam& B)
@@ -62,7 +80,53 @@ inline bool operator>(const FApologueEventCallbackParam& A, const FApologueEvent
 	check(A.IsValid());
 	check(B.IsValid());
 	checkf(A.Event == B.Event, UNLIKE_EVENT_COMPARISON);
-	return A.Priority == B.Priority ? A.SubPriority > B.SubPriority : A.Priority > B.Priority;
+	if (A.Priority == B.Priority)
+	{
+		if (A.SubPriority == B.SubPriority)
+		{
+			return A.Order > B.Order;
+		}
+
+		return A.SubPriority > B.SubPriority;
+	}
+
+	return A.Priority > B.Priority;
+}
+
+inline bool operator<=(const FApologueEventCallbackParam& A, const FApologueEventCallbackParam& B)
+{
+	check(A.IsValid());
+	check(B.IsValid());
+	checkf(A.Event == B.Event, UNLIKE_EVENT_COMPARISON);
+	if (A.Priority == B.Priority)
+	{
+		if (A.SubPriority == B.SubPriority)
+		{
+			return A.Order <= B.Order;
+		}
+
+		return A.SubPriority < B.SubPriority;
+	}
+
+	return A.Priority < B.Priority;
+}
+
+inline bool operator>=(const FApologueEventCallbackParam& A, const FApologueEventCallbackParam& B)
+{
+	check(A.IsValid());
+	check(B.IsValid());
+	checkf(A.Event == B.Event, UNLIKE_EVENT_COMPARISON);
+	if (A.Priority == B.Priority)
+    {
+    	if (A.SubPriority == B.SubPriority)
+    	{
+    		return A.Order >= B.Order;
+    	}
+
+		return A.SubPriority > B.SubPriority;
+    }
+
+	return A.Priority > B.Priority;
 }
 
 #undef UNLIKE_EVENT_COMPARISON
