@@ -198,13 +198,19 @@ public:
 	{
 		Super::Serialize(Ar);
 
-		GetEngine()->Serialize(Ar);
+		if (FRandomEngine* Engine = GetEngine())
+		{
+			Engine->Serialize(Ar);
+		}
 	}
 
 	virtual void Serialize(FStructuredArchive::FRecord Record) override
 	{
 		Super::Serialize(Record);
 
-		GetEngine()->Serialize(Record);
+		if (FRandomEngine* Engine = GetEngine())
+		{
+			Engine->Serialize(Record);
+		}
 	}
 };
