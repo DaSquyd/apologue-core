@@ -9,8 +9,10 @@
 class UApologueEvent;
 class UApologueEventContext;
 
+DECLARE_DYNAMIC_DELEGATE(FApologueBroadcastEventFinishedCallback);
+
 // This class does not need to be modified.
-UINTERFACE()
+UINTERFACE(BlueprintType)
 class UApologueEventBroadcasterInterface : public UInterface
 {
 	GENERATED_BODY()
@@ -26,5 +28,8 @@ class APOLOGUECORE_API IApologueEventBroadcasterInterface
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Apologue Event Broadcaster Interface")
-	void EventBroadcaster_BroadcastEvent(const TSoftObjectPtr<UApologueEvent>& Event, const UApologueEventContext* Context);
+	void EventBroadcaster_BroadcastEvent(const TSoftObjectPtr<UApologueEvent>& Event, UApologueEventContext* Context, const FApologueBroadcastEventFinishedCallback& Callback);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Apologue Event Broadcaster Interface")
+	void EventBroadcaster_CompleteDeferred();
 };

@@ -12,7 +12,7 @@ class UApologueEventSortHandler;
 /**
  * 
  */
-UCLASS(BlueprintType)
+UCLASS()
 class APOLOGUECORE_API UApologueEvent : public UDataAsset
 {
 	GENERATED_BODY()
@@ -29,4 +29,5 @@ class APOLOGUECORE_API UApologueEvent : public UDataAsset
 public:
 	TSoftClassPtr<UObject> GetListenerClass() const { return ListenerClass; }
 	TSoftClassPtr<UApologueEventContext> GetContextClass() const { return ContextClass; }
+	UApologueEventSortHandler* GetSortHandler() const { return SortHandler; }
 };

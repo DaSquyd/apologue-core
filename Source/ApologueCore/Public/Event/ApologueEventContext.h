@@ -6,7 +6,7 @@
 #include "UObject/Object.h"
 #include "ApologueEventContext.generated.h"
 
-class UApologueEventVariable;
+class IApologueEventBroadcasterInterface;
 
 /**
  * Base class for event context.
@@ -15,7 +15,7 @@ UCLASS(Abstract, BlueprintType, Blueprintable)
 class APOLOGUECORE_API UApologueEventContext : public UObject
 {
 	GENERATED_BODY()
-
+	
 	UPROPERTY(BlueprintReadOnly, Category="Apologue Event Context", meta=(AllowPrivateAccess))
 	bool bIsCanceled = false;
 
@@ -27,7 +27,5 @@ public:
 	void Cancel() { bIsCanceled = true; }
 
 	int32 GetDepth() const { return Depth; }
-
-	UFUNCTION(BlueprintCallable, Category="Apologue Event Context")
-	UPARAM(DisplayName="New Depth") int32 IncrementDepth() { return ++Depth; }
+	void SetDepth(const int32 NewDepth) { Depth = NewDepth; }
 };
